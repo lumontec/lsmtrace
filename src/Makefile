@@ -8,8 +8,9 @@ LIBBPF_OBJ := $(abspath $(OUTPUT)/libbpf.a)
 INCLUDES := -I$(OUTPUT)
 CFLAGS := -g -Wall
 ARCH := $(shell uname -m | sed 's/x86_64/x86/')
+DIRT := compile_commands.json
 
-APPS = bootstrap
+APPS = lsmtrace
 
 # Get Clang's default includes on this system. We'll explicitly add these dirs
 # to the includes list when compiling with `-target bpf` because otherwise some
@@ -40,7 +41,7 @@ all: $(APPS)
 .PHONY: clean
 clean:
 	$(call msg,CLEAN)
-	$(Q)rm -rf $(OUTPUT) $(APPS)
+	$(Q)rm -rf $(OUTPUT) $(APPS) $(DIRT)
 
 $(OUTPUT) $(OUTPUT)/libbpf:
 	$(call msg,MKDIR,$@)

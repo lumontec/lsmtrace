@@ -1,10 +1,19 @@
 /* SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause) */
 /* Copyright (c) 2020 Facebook */
-#ifndef __BOOTSTRAP_H
-#define __BOOTSTRAP_H
+#ifndef __LMSTRACE_H
+#define __LMSTRACE_H
 
 #define TASK_COMM_LEN 16
 #define MAX_FILENAME_LEN 127
+
+#include <linux/limits.h>
+
+struct process_info {
+	int ppid;
+	int pid;
+	int tgid;
+	char name[PATH_MAX];
+};
 
 struct event {
 	int pid;
@@ -16,4 +25,4 @@ struct event {
 	bool exit_event;
 };
 
-#endif /* __BOOTSTRAP_H */
+#endif /* __LMSTRACE_H */
