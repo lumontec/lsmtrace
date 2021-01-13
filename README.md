@@ -4,9 +4,18 @@ Trace all lsm hooks touched by executable
 
 ## Requirements
 
-Your kernel requires the following config variables:
+Your kernel must have been compiled with the follwing options:
+BPF_SYSCALL
+BPF_LSM
+DEBUG_INFO
+DEBUG_INFO_BTF
 
 ## Compilation
 
-## Filer
-Will be able to filter by specific syscall
+```shell
+$ git submodule update --init --recursive    # check out libbpf
+$ cd src
+$ make
+$ sudo ./lmstrace [process] -s [syscall]
+```
+
