@@ -546,7 +546,7 @@ SEC("lsm/kernfs_init_security")
 int BPF_PROG(kernfs_init_security, struct kernfs_node *kn_dir,
 	 struct kernfs_node *kn)
 {
-	bpf_printk("lsm_hook: inode: kernfs_init_security\n");
+	bpf_printk("lsm_hook: kernfs_node: kernfs_init_security\n");
 	return 0;
 }
 
@@ -556,35 +556,35 @@ int BPF_PROG(kernfs_init_security, struct kernfs_node *kn_dir,
 SEC("lsm/file_permission")
 int BPF_PROG(file_permission, struct file *file, int mask)
 {
-	bpf_printk("lsm_hook: inode: file_permission\n");
+	bpf_printk("lsm_hook: file: file_permission\n");
 	return 0;
 }
 
 SEC("lsm/file_alloc_security")
 int BPF_PROG(file_alloc_security, struct file *file)
 {
-	bpf_printk("lsm_hook: inode: file_alloc_security\n");
+	bpf_printk("lsm_hook: file: file_alloc_security\n");
 	return 0;
 }
 
 SEC("lsm/file_alloc_security")
 void BPF_PROG(file_free_security, struct file *file)
 {
-	bpf_printk("lsm_hook: inode: file_free_security\n");
+	bpf_printk("lsm_hook: file: file_free_security\n");
 }
 
 SEC("lsm/file_ioctl")
 int BPF_PROG(file_ioctl, struct file *file, unsigned int cmd,
 	 unsigned long arg)
 {
-	bpf_printk("lsm_hook: inode: file_ioctl\n");
+	bpf_printk("lsm_hook: file: file_ioctl\n");
 	return 0;
 }
 
 SEC("lsm/mmap_addr")
 int BPF_PROG(mmap_addr, unsigned long addr)
 {
-	bpf_printk("lsm_hook: inode: mmap_addr\n");
+	bpf_printk("lsm_hook: file: mmap_addr\n");
 	return 0;
 }
 
@@ -592,7 +592,7 @@ SEC("lsm/mmap_file")
 int BPF_PROG(mmap_file, struct file *file, unsigned long reqprot,
 	 unsigned long prot, unsigned long flags)
 {
-	bpf_printk("lsm_hook: inode: mmap_file\n");
+	bpf_printk("lsm_hook: file: mmap_file\n");
 	return 0;
 }
 
@@ -600,14 +600,14 @@ SEC("lsm/file_mprotect")
 int BPF_PROG(file_mprotect, struct vm_area_struct *vma,
 	 unsigned long reqprot, unsigned long prot)
 {
-	bpf_printk("lsm_hook: inode: file_mprotect\n");
+	bpf_printk("lsm_hook: file: file_mprotect\n");
 	return 0;
 }
 
 SEC("lsm/file_lock")
 int BPF_PROG(file_lock, struct file *file, unsigned int cmd)
 {
-	bpf_printk("lsm_hook: inode: file_mprotect\n");
+	bpf_printk("lsm_hook: file: file_mprotect\n");
 	return 0;
 }
 
@@ -615,9 +615,106 @@ SEC("lsm/file_fcntl")
 int BPF_PROG(file_fcntl, struct file *file, unsigned int cmd,
 	 unsigned long arg)
 {
-	bpf_printk("lsm_hook: inode: file_fcntl\n");
+	bpf_printk("lsm_hook: file: file_fcntl\n");
 	return 0;
 }
+
+SEC("lsm/file_set_fowner")
+int BPF_PROG(file_set_fowner, struct file *file)
+{
+	bpf_printk("lsm_hook: file: file_set_fowner\n");
+	return 0;
+}
+
+SEC("lsm/file_send_sigiotask")
+int BPF_PROG(file_send_sigiotask, struct task_struct *tsk,
+	 struct fown_struct *fown, int sig)
+{
+	bpf_printk("lsm_hook: file: file_send_sigiotask\n");
+	return 0;
+}
+
+SEC("lsm/file_receive")
+int BPF_PROG(file_receive, struct file *file)
+{
+	bpf_printk("lsm_hook: file: file_receive\n");
+	return 0;
+}
+
+SEC("lsm/file_open")
+int BPF_PROG(file_open, struct file *file)
+{
+	bpf_printk("lsm_hook: file: file_open\n");
+	return 0;
+}
+
+
+
+// Security hooks for task operations.
+
+SEC("lsm/task_alloc")
+int BPF_PROG(task_alloc, struct task_struct *task,
+	 unsigned long clone_flags)
+{
+	bpf_printk("lsm_hook: task: task_alloc\n");
+	return 0;
+}
+
+SEC("lsm/task_free")
+void BPF_PROG(task_free, struct task_struct *task)
+{
+	bpf_printk("lsm_hook: task: task_free\n");
+}
+
+SEC("lsm/cred_alloc_blank")
+int BPF_PROG(cred_alloc_blank, struct cred *cred, gfp_t gfp)
+{
+	bpf_printk("lsm_hook: task: cred_alloc_blank\n");
+	return 0;
+}
+
+SEC("lsm/cred_free")
+void BPF_PROG(cred_free, struct cred *cred)
+{
+	bpf_printk("lsm_hook: task: cred_free\n");
+}
+
+SEC("lsm/cred_prepare")
+int BPF_PROG(cred_prepare, struct cred *new, const struct cred *old,
+	 gfp_t gfp)
+{
+	bpf_printk("lsm_hook: task: cred_prepare\n");
+	return 0;
+}
+
+SEC("lsm/cred_transfer")
+void BPF_PROG(cred_transfer, struct cred *new,
+	 const struct cred *old)
+{
+	bpf_printk("lsm_hook: task: cred_transfer\n");
+}
+
+SEC("lsm/cred_getsecid")
+void BPF_PROG(cred_getsecid, const struct cred *c, u32 *secid)
+{
+	bpf_printk("lsm_hook: task: cred_getsecid\n");
+}
+
+SEC("lsm/kernel_act_as")
+int BPF_PROG(kernel_act_as, struct cred *new, u32 secid)
+{
+	bpf_printk("lsm_hook: task: kernel_act_as\n");
+}
+
+SEC("lsm/kernel_create_files_as")
+int BPF_PROG(kernel_create_files_as, struct cred *new, struct inode *inode)
+{
+	bpf_printk("lsm_hook: task: kernel_create_files_as\n");
+}
+
+
+
+
 
 
 
