@@ -19,12 +19,12 @@
 #include <bpf/bpf_core_read.h>
 #include "lsmtrace.h"
 
-//struct {
-//	__uint(type, BPF_MAP_TYPE_RINGBUF);
-//	__uint(max_entries, 1 << 24);
-//} ringbuf SEC(".maps");
-//
-//long ringbuffer_flags = 0;
+struct {
+	__uint(type, BPF_MAP_TYPE_RINGBUF);
+	__uint(max_entries, 1 << 24);
+} ringbuf SEC(".maps");
+
+long ringbuffer_flags = 0;
 
 
 //  Security hooks for program execution operations. 
@@ -198,13 +198,13 @@ int BPF_PROG(move_mount, const struct path *from_path,
 	return 0;
 }
 
-SEC("lsm/dentry_init_security")
-int BPF_PROG(dentry_init_security, struct dentry *dentry,
-	 int mode, const struct qstr *name, void **ctx, u32 *ctxlen)
-{
-	bpf_printk("lsm_hook: fs: dentry_init_security\n");
-	return 0;
-}
+//SEC("lsm/dentry_init_security")
+//int BPF_PROG(dentry_init_security, struct dentry *dentry,
+//	 int mode, const struct qstr *name, void **ctx, u32 *ctxlen)
+//{
+//	bpf_printk("lsm_hook: fs: dentry_init_security\n");
+//	return 0;
+//}
 
 SEC("lsm/dentry_create_files_as")
 int BPF_PROG(dentry_create_files_as, struct dentry *dentry, int mode,
