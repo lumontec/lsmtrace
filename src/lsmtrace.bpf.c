@@ -19,12 +19,12 @@
 #include <bpf/bpf_core_read.h>
 #include "lsmtrace.h"
 
-struct {
-	__uint(type, BPF_MAP_TYPE_RINGBUF);
-	__uint(max_entries, 1 << 24);
-} ringbuf SEC(".maps");
-
-long ringbuffer_flags = 0;
+//struct {
+//	__uint(type, BPF_MAP_TYPE_RINGBUF);
+//	__uint(max_entries, 1 << 24);
+//} ringbuf SEC(".maps");
+//
+//long ringbuffer_flags = 0;
 
 
 //  Security hooks for program execution operations. 
@@ -109,7 +109,113 @@ int BPF_PROG(sb_eat_lsm_opts, char *orig, void **mnt_opts)
 	return 0;
 }
 
+SEC("lsm/sb_statfs")
+int BPF_PROG(sb_statfs, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: fs: sb_statfs\n");
+	return 0;
+}
 
+SEC("lsm/sb_mount")
+int BPF_PROG(sb_mount, const char *dev_name, const struct path *path,
+	const char *type, unsigned long flags, void *data)
+{
+	bpf_printk("lsm_hook: fs: sb_mount\n");
+	return 0;
+}
+
+// @sb_copy_data
+
+SEC("lsm/sb_remount")
+int BPF_PROG(sb_remount, struct super_block *sb, void *mnt_opts)
+{
+	bpf_printk("lsm_hook: fs: sb_mount\n");
+	return 0;
+}
+
+SEC("lsm/sb_kern_mount")
+int BPF_PROG(sb_kern_mount, struct super_block *sb)
+{
+	bpf_printk("lsm_hook: fs: sb_kern_mount\n");
+	return 0;
+}
+
+SEC("lsm/sb_show_options")
+int BPF_PROG(sb_show_options, struct seq_file *m, struct super_block *sb)
+{
+	bpf_printk("lsm_hook: fs: sb_show_options\n");
+	return 0;
+}
+
+SEC("lsm/sb_umount")
+int BPF_PROG(sb_umount, struct vfsmount *mnt, int flags)
+{
+	bpf_printk("lsm_hook: fs: sb_umount\n");
+	return 0;
+}
+
+SEC("lsm/sb_pivotroot")
+int BPF_PROG(sb_pivotroot, const struct path *old_path,
+	 const struct path *new_path)
+{
+	bpf_printk("lsm_hook: fs: sb_pivotroot\n");
+	return 0;
+}
+
+SEC("lsm/sb_set_mnt_opts")
+int BPF_PROG(sb_set_mnt_opts, struct super_block *sb, void *mnt_opts,
+	 unsigned long kern_flags, unsigned long *set_kern_flags)
+{
+	bpf_printk("lsm_hook: fs: sb_set_mnt_opts\n");
+	return 0;
+}
+
+SEC("lsm/sb_clone_mnt_opts")
+int BPF_PROG(sb_clone_mnt_opts, const struct super_block *oldsb,
+	 struct super_block *newsb, unsigned long kern_flags,
+	 unsigned long *set_kern_flags)
+{
+	bpf_printk("lsm_hook: fs: sb_clone_mnt_opts\n");
+	return 0;
+}
+
+SEC("lsm/sb_add_mnt_opt")
+int BPF_PROG(sb_add_mnt_opt, const char *option, const char *val,
+	 int len, void **mnt_opts)
+{
+	bpf_printk("lsm_hook: fs: sb_add_mnt_opt\n");
+	return 0;
+}
+
+// @sb_parse_opts_str
+
+
+SEC("lsm/move_mount")
+int BPF_PROG(move_mount, const struct path *from_path,
+	 const struct path *to_path)
+{
+	bpf_printk("lsm_hook: fs: move_mount\n");
+	return 0;
+}
+
+SEC("lsm/dentry_init_security")
+int BPF_PROG(dentry_init_security, struct dentry *dentry,
+	 int mode, const struct qstr *name, void **ctx, u32 *ctxlen)
+{
+	bpf_printk("lsm_hook: fs: dentry_init_security\n");
+	return 0;
+}
+
+SEC("lsm/dentry_create_files_as")
+int BPF_PROG(dentry_create_files_as, struct dentry *dentry, int mode,
+	 struct qstr *name, const struct cred *old, struct cred *new)
+{
+	bpf_printk("lsm_hook: fs: dentry_create_files_as\n");
+	return 0;
+}
+
+
+// Security hooks for inode operations.
 
 
 
@@ -118,6 +224,11 @@ int BPF_PROG(sb_eat_lsm_opts, char *orig, void **mnt_opts)
 
 
 char _license[] SEC("license") = "GPL";
+
+
+// Not implemented:
+// sb_copy_data
+// sb_parse_opts_str
 
 
 
