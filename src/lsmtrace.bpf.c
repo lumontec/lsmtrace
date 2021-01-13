@@ -217,6 +217,410 @@ int BPF_PROG(dentry_create_files_as, struct dentry *dentry, int mode,
 
 // Security hooks for inode operations.
 
+SEC("lsm/inode_alloc_security")
+int BPF_PROG(inode_alloc_security, struct inode *inode)
+{
+	bpf_printk("lsm_hook: inode: inode_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/inode_free_security")
+void BPF_PROG(inode_free_security, struct inode *inode)
+{
+	bpf_printk("lsm_hook: inode: inode_free_security\n");
+}
+
+SEC("lsm/inode_init_security")
+int BPF_PROG(inode_init_security, struct inode *inode,
+	 struct inode *dir, const struct qstr *qstr, const char **name,
+	 void **value, size_t *len)
+{
+	bpf_printk("lsm_hook: inode: inode_init_security\n");
+	return 0;
+}
+
+SEC("lsm/inode_create")
+int BPF_PROG(inode_create, struct inode *dir, struct dentry *dentry,
+	 umode_t mode)
+{
+	bpf_printk("lsm_hook: inode: inode_create\n");
+	return 0;
+}
+
+SEC("lsm/inode_link")
+int BPF_PROG(inode_link, struct dentry *old_dentry, struct inode *dir,
+	 struct dentry *new_dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_link\n");
+	return 0;
+}
+
+SEC("lsm/path_link")
+int BPF_PROG(path_link, struct dentry *old_dentry,
+	 const struct path *new_dir, struct dentry *new_dentry)
+{
+	bpf_printk("lsm_hook: inode: path_link\n");
+	return 0;
+}
+
+SEC("lsm/inode_unlink")
+int BPF_PROG(inode_unlink, struct inode *dir, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_unlink\n");
+	return 0;
+}
+
+SEC("lsm/path_unlink")
+int BPF_PROG(path_unlink, const struct path *dir, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: path_unlink\n");
+	return 0;
+}
+
+SEC("lsm/inode_symlink")
+int BPF_PROG(inode_symlink, struct inode *dir, struct dentry *dentry,
+	 const char *old_name)
+{
+	bpf_printk("lsm_hook: inode: inode_symlink\n");
+	return 0;
+}
+
+SEC("lsm/path_symlink")
+int BPF_PROG(path_symlink, const struct path *dir, struct dentry *dentry,
+	 const char *old_name)
+{
+	bpf_printk("lsm_hook: inode: path_symlink\n");
+	return 0;
+}
+
+SEC("lsm/inode_mkdir")
+int BPF_PROG(inode_mkdir, struct inode *dir, struct dentry *dentry,
+	 umode_t mode)
+{
+	bpf_printk("lsm_hook: inode: inode_mkdir\n");
+	return 0;
+}
+
+SEC("lsm/path_mkdir")
+int BPF_PROG(path_mkdir, const struct path *dir, struct dentry *dentry,
+	 umode_t mode)
+{
+	bpf_printk("lsm_hook: inode: path_mkdir\n");
+	return 0;
+}
+
+SEC("lsm/inode_rmdir")
+int BPF_PROG(inode_rmdir, struct inode *dir, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_rmdir\n");
+	return 0;
+}
+
+SEC("lsm/path_rmdir")
+int BPF_PROG(path_rmdir, const struct path *dir, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: path_rmdir\n");
+	return 0;
+}
+
+SEC("lsm/inode_mknod")
+int BPF_PROG(inode_mknod, struct inode *dir, struct dentry *dentry,
+	 umode_t mode, dev_t dev)
+{
+	bpf_printk("lsm_hook: inode: inode_mknod\n");
+	return 0;
+}
+
+SEC("lsm/inode_rename")
+int BPF_PROG(inode_rename, struct inode *old_dir, struct dentry *old_dentry,
+	 struct inode *new_dir, struct dentry *new_dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_rename\n");
+	return 0;
+}
+
+SEC("lsm/path_rename")
+int BPF_PROG(path_rename, const struct path *old_dir,
+	 struct dentry *old_dentry, const struct path *new_dir,
+	 struct dentry *new_dentry)
+{
+	bpf_printk("lsm_hook: inode: path_rename\n");
+	return 0;
+}
+
+SEC("lsm/path_chmod")
+int BPF_PROG(path_chmod, const struct path *path, umode_t mode)
+{
+	bpf_printk("lsm_hook: inode: path_chmod\n");
+	return 0;
+}
+
+//SEC("lsm/path_chown")
+//int BPF_PROG(path_chown, const struct path *path, kuid_t uid, kgid_t gid)
+//{
+//	bpf_printk("lsm_hook: inode: path_chown\n");
+//	return 0;
+//}
+
+SEC("lsm/path_chroot")
+int BPF_PROG(path_chroot, const struct path *path)
+{
+	bpf_printk("lsm_hook: inode: path_chroot\n");
+	return 0;
+}
+
+SEC("lsm/path_notify")
+int BPF_PROG(path_notify, const struct path *path, u64 mask,
+	 unsigned int obj_type)
+{
+	bpf_printk("lsm_hook: inode: path_notify\n");
+	return 0;
+}
+
+SEC("lsm/inode_readlink")
+int BPF_PROG(inode_readlink, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_readlink\n");
+	return 0;
+}
+
+SEC("lsm/inode_follow_link")
+int BPF_PROG(inode_follow_link, struct dentry *dentry, struct inode *inode,
+	 bool rcu)
+{
+	bpf_printk("lsm_hook: inode: inode_follow_link\n");
+	return 0;
+}
+
+SEC("lsm/inode_permission")
+int BPF_PROG(inode_permission, struct inode *inode, int mask)
+{
+	bpf_printk("lsm_hook: inode: inode_permission\n");
+	return 0;
+}
+
+SEC("lsm/inode_setattr")
+int BPF_PROG(inode_setattr, struct dentry *dentry, struct iattr *attr)
+{
+	bpf_printk("lsm_hook: inode: inode_setattr\n");
+	return 0;
+}
+
+SEC("lsm/path_truncate")
+int BPF_PROG(path_truncate, const struct path *path)
+{
+	bpf_printk("lsm_hook: inode: path_truncate\n");
+	return 0;
+}
+
+SEC("lsm/inode_getattr")
+int BPF_PROG(inode_getattr, const struct path *path)
+{
+	bpf_printk("lsm_hook: inode: inode_getattr\n");
+	return 0;
+}
+
+SEC("lsm/inode_setxattr")
+int BPF_PROG(inode_setxattr, struct dentry *dentry, const char *name,
+	 const void *value, size_t size, int flags)
+{
+	bpf_printk("lsm_hook: inode: inode_setxattr\n");
+	return 0;
+}
+
+SEC("lsm/inode_post_setxattr")
+int BPF_PROG(inode_post_setxattr, struct dentry *dentry,
+	 const char *name, const void *value, size_t size, int flags)
+{
+	bpf_printk("lsm_hook: inode: inode_post_setxattr\n");
+	return 0;
+}
+
+SEC("lsm/inode_getxattr")
+int BPF_PROG(inode_getxattr, struct dentry *dentry, const char *name)
+{
+	bpf_printk("lsm_hook: inode: inode_getxattr\n");
+	return 0;
+}
+
+SEC("lsm/inode_listxattr")
+int BPF_PROG(inode_listxattr, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_listxattr\n");
+	return 0;
+}
+
+SEC("lsm/inode_removexattr")
+int BPF_PROG(inode_removexattr, struct dentry *dentry, const char *name)
+{
+	bpf_printk("lsm_hook: inode: inode_removexattr\n");
+	return 0;
+}
+
+SEC("lsm/inode_getsecurity")
+int BPF_PROG(inode_getsecurity, struct inode *inode,
+	 const char *name, void **buffer, bool alloc)
+{
+	bpf_printk("lsm_hook: inode: inode_getsecurity\n");
+	return 0;
+}
+
+SEC("lsm/inode_setsecurity")
+int BPF_PROG(inode_setsecurity, struct inode *inode,
+	 const char *name, const void *value, size_t size, int flags)
+{
+	bpf_printk("lsm_hook: inode: inode_setsecurity\n");
+	return 0;
+}
+
+
+SEC("lsm/inode_listsecurity")
+int BPF_PROG(inode_listsecurity, struct inode *inode, char *buffer,
+	 size_t buffer_size)
+{
+	bpf_printk("lsm_hook: inode: inode_listsecurity\n");
+	return 0;
+}
+
+SEC("lsm/inode_need_killpriv")
+int BPF_PROG(inode_need_killpriv, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_need_killpriv\n");
+	return 0;
+}
+
+SEC("lsm/inode_killpriv")
+int BPF_PROG(inode_killpriv, struct dentry *dentry)
+{
+	bpf_printk("lsm_hook: inode: inode_killpriv\n");
+	return 0;
+}
+
+SEC("lsm/inode_getsecid")
+void BPF_PROG(inode_getsecid, struct inode *inode, u32 *secid)
+{
+	bpf_printk("lsm_hook: inode: inode_getsecid\n");
+}
+
+SEC("lsm/inode_copy_up")
+int BPF_PROG(inode_copy_up, struct dentry *src, struct cred **new)
+{
+	bpf_printk("lsm_hook: inode: inode_copy_up\n");
+	return 0;
+}
+
+SEC("lsm/inode_copy_up_xattr")
+int BPF_PROG(inode_copy_up_xattr, const char *name)
+{
+	bpf_printk("lsm_hook: inode: inode_copy_up_xattr\n");
+	return 0;
+}
+
+SEC("lsm/d_instantiate")
+int BPF_PROG(d_instantiate, struct dentry *dentry,
+	 struct inode *inode)
+{
+	bpf_printk("lsm_hook: inode: d_instantiate\n");
+	return 0;
+}
+
+SEC("lsm/getprocattr")
+int BPF_PROG(getprocattr, struct task_struct *p, char *name,
+	 char **value)
+{
+	bpf_printk("lsm_hook: inode: getprocattr\n");
+	return 0;
+}
+
+SEC("lsm/setprocattr")
+int BPF_PROG(setprocattr, const char *name, void *value, size_t size)
+{
+	bpf_printk("lsm_hook: inode: setprocattr\n");
+	return 0;
+}
+
+
+// Security hooks for kernfs node operations
+
+SEC("lsm/kernfs_init_security")
+int BPF_PROG(kernfs_init_security, struct kernfs_node *kn_dir,
+	 struct kernfs_node *kn)
+{
+	bpf_printk("lsm_hook: inode: kernfs_init_security\n");
+	return 0;
+}
+
+
+// Security hooks for file operations
+
+SEC("lsm/file_permission")
+int BPF_PROG(file_permission, struct file *file, int mask)
+{
+	bpf_printk("lsm_hook: inode: file_permission\n");
+	return 0;
+}
+
+SEC("lsm/file_alloc_security")
+int BPF_PROG(file_alloc_security, struct file *file)
+{
+	bpf_printk("lsm_hook: inode: file_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/file_alloc_security")
+void BPF_PROG(file_free_security, struct file *file)
+{
+	bpf_printk("lsm_hook: inode: file_free_security\n");
+}
+
+SEC("lsm/file_ioctl")
+int BPF_PROG(file_ioctl, struct file *file, unsigned int cmd,
+	 unsigned long arg)
+{
+	bpf_printk("lsm_hook: inode: file_ioctl\n");
+	return 0;
+}
+
+SEC("lsm/mmap_addr")
+int BPF_PROG(mmap_addr, unsigned long addr)
+{
+	bpf_printk("lsm_hook: inode: mmap_addr\n");
+	return 0;
+}
+
+SEC("lsm/mmap_file")
+int BPF_PROG(mmap_file, struct file *file, unsigned long reqprot,
+	 unsigned long prot, unsigned long flags)
+{
+	bpf_printk("lsm_hook: inode: mmap_file\n");
+	return 0;
+}
+
+SEC("lsm/file_mprotect")
+int BPF_PROG(file_mprotect, struct vm_area_struct *vma,
+	 unsigned long reqprot, unsigned long prot)
+{
+	bpf_printk("lsm_hook: inode: file_mprotect\n");
+	return 0;
+}
+
+SEC("lsm/file_lock")
+int BPF_PROG(file_lock, struct file *file, unsigned int cmd)
+{
+	bpf_printk("lsm_hook: inode: file_mprotect\n");
+	return 0;
+}
+
+SEC("lsm/file_fcntl")
+int BPF_PROG(file_fcntl, struct file *file, unsigned int cmd,
+	 unsigned long arg)
+{
+	bpf_printk("lsm_hook: inode: file_fcntl\n");
+	return 0;
+}
+
+
+
 
 
 
