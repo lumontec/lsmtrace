@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
-/* Copyright (c) 2020 Facebook */
+//
+
 #include <argp.h>
 #include <signal.h>
 #include <stdio.h>
@@ -79,12 +80,18 @@ static void bump_memlock_rlimit(void)
 	}
 }
 
-//static volatile bool exiting = false;
-//
-//static void sig_handler(int sig)
-//{
-//	exiting = true;
-//}
+static volatile bool exiting = false;
+
+static void sig_handler(int sig)
+{
+	if (SIGINT == sig)
+		fprintf(stdout, "Received signal SIGINT\n");
+
+	if (SIGTERM == sig)
+		fprintf(stdout, "Received signal SIGTERM\n");
+
+	exiting = true;
+}
 
 static int handle_event(void *ctx, void *data, size_t len)
 {
@@ -136,9 +143,9 @@ int main(int argc, char **argv)
 	/* Bump RLIMIT_MEMLOCK to create BPF maps */
 	bump_memlock_rlimit();
 
-//	/* Cleaner handling of Ctrl-C */
-//	signal(SIGINT, sig_handler);
-//	signal(SIGTERM, sig_handler);
+	/* Cleaner handling of Ctrl-C */
+	signal(SIGINT, sig_handler);
+	signal(SIGTERM, sig_handler);
 
 	/* Load and verify BPF application */
 	skel = lsmtrace_bpf__open();
@@ -157,12 +164,16 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
+	fprintf(stdout, "Attaching hooks, don`t rush..\n");
+
 	/* Attach tracepoints */
 	err = lsmtrace_bpf__attach(skel);
 	if (err) {
 		fprintf(stderr, "Failed to attach BPF skeleton\n");
 		goto cleanup;
 	}
+
+	fprintf(stdout, "Attached, launching executable\n");
 
 	/* Set up ring buffer polling */
 	ringbuffer = ring_buffer__new(bpf_map__fd(skel->maps.ringbuf), handle_event, NULL, NULL);
@@ -172,18 +183,15 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	/* Process events */
-	printf("%-8s %-5s %-16s %-7s %-7s %s\n",
-	       "TIME", "EVENT", "COMM", "PID", "PPID", "FILENAME/EXIT CODE");
 
 	// Trigger program every sec
-	for (;;) {
+	while (!exiting) {
 		/* trigger our BPF program */
 		fprintf(stderr, ".");
 		sleep(1);
 	}
 
-
+	fprintf(stdout, "Closing tracer\n");
 
 //	while (!exiting) {
 //		err = ring_buffer__poll(ringbuffer, 100 /* timeout, ms */);
