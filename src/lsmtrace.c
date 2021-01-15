@@ -16,6 +16,12 @@ static struct env {
 	long min_duration_ms;
 } env;
 
+
+//const char    *my_argv[64] = {"/foo/bar/baz" , "-foo" , "-bar" , NULL};
+const char    *my_argv[64] = {"/bin/ls" , "/home", NULL};
+
+
+
 const char *argp_program_version = "lsmtrace 0.1";
 const char *argp_program_bug_address = "<https://github.com/lumontec/lsmtrace.git/issues>";
 const char argp_program_doc[] =
@@ -82,8 +88,11 @@ static void bump_memlock_rlimit(void)
 
 static volatile bool exiting = false;
 
-static void sig_handler(int sig)
+static void sig_parentHandler(int sig)
 {
+
+	if (exiting) return;
+
 	if (SIGINT == sig)
 		fprintf(stdout, "Received signal SIGINT\n");
 
@@ -93,38 +102,75 @@ static void sig_handler(int sig)
 	exiting = true;
 }
 
-static int handle_event(void *ctx, void *data, size_t len)
+static void sig_childHandler(int sig)
 {
-	if(len < sizeof(struct process_info)) {
-		return -1;
-	}
+	if (SIGCONT == sig)
+		fprintf(stdout, "Received signal SIGCONT\n");
+}
 
-	const struct process_info *s = data;
-	printf("%d\t%d\t%d\t%s\n", s->ppid, s->pid, s->tgid, s->name);
-	return 0;
-
-//	const struct event *e = data;
-//	struct tm *tm;
-//	char ts[32];
-//	time_t t;
-//
-//	time(&t);
-//	tm = localtime(&t);
-//	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
-//
-//	if (e->exit_event) {
-//		printf("%-8s %-5s %-16s %-7d %-7d [%u]",
-//		       ts, "EXIT", e->comm, e->pid, e->ppid, e->exit_code);
-//		if (e->duration_ns)
-//			printf(" (%llums)", e->duration_ns / 1000000);
-//		printf("\n");
-//	} else {
-//		printf("%-8s %-5s %-16s %-7d %-7d %s\n",
-//		       ts, "EXEC", e->comm, e->pid, e->ppid, e->filename);
+//static int handle_event(void *ctx, void *data, size_t len)
+//{
+//	if(len < sizeof(struct process_info)) {
+//		return -1;
 //	}
 //
+//	const struct process_info *s = data;
+//	printf("%d\t%d\t%d\t%s\n", s->ppid, s->pid, s->tgid, s->name);
 //	return 0;
+//
+////	const struct event *e = data;
+////	struct tm *tm;
+////	char ts[32];
+////	time_t t;
+////
+////	time(&t);
+////	tm = localtime(&t);
+////	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
+////
+////	if (e->exit_event) {
+////		printf("%-8s %-5s %-16s %-7d %-7d [%u]",
+////		       ts, "EXIT", e->comm, e->pid, e->ppid, e->exit_code);
+////		if (e->duration_ns)
+////			printf(" (%llums)", e->duration_ns / 1000000);
+////		printf("\n");
+////	} else {
+////		printf("%-8s %-5s %-16s %-7d %-7d %s\n",
+////		       ts, "EXEC", e->comm, e->pid, e->ppid, e->filename);
+////	}
+////
+////	return 0;
+//}
+
+
+/* forks waiting for SIGCONT and returns pid */
+static int exec_prog_and_wait(const char **argv)
+{
+	int my_pid;
+
+	my_pid = fork();
+     	if (my_pid < 0)
+	{
+		fprintf(stderr, "Could not execute fork\n");
+         	exit(1);
+	}
+
+	/* child process */
+     	if (my_pid == 0)
+        {
+		fprintf(stdout, "Forked child process, paused waiting for SIGCONT\n");
+		signal(SIGCONT, sig_childHandler);
+		pause();
+		fprintf(stdout, "Forked child process, executing\n");
+		if (-1 == execve(argv[0], (char **)argv , NULL)) {
+			perror("child process execve failed [%m]");
+			exit(1);
+		}
+		exit(0);
+	}
+
+	return my_pid;
 }
+
 
 int main(int argc, char **argv)
 {
@@ -144,8 +190,15 @@ int main(int argc, char **argv)
 	bump_memlock_rlimit();
 
 	/* Cleaner handling of Ctrl-C */
-	signal(SIGINT, sig_handler);
-	signal(SIGTERM, sig_handler);
+	signal(SIGINT, sig_parentHandler);
+	signal(SIGTERM, sig_parentHandler);
+
+	fprintf(stdout, "Launching process fork\n");
+
+	int child_pid = exec_prog_and_wait(my_argv);
+
+	fprintf(stdout, "Parent pid: %d\n", getpid());
+	fprintf(stdout, "Child pid: %d\n", child_pid);
 
 	/* Load and verify BPF application */
 	skel = lsmtrace_bpf__open();
@@ -154,8 +207,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	/* ensure BPF program only handles write() syscalls from our process */
-	skel->bss->my_pid = getpid();
+	/* pass child pid to bpf side */
+	skel->bss->my_pid = child_pid;
 
 	/* Load & verify BPF programs */
 	err = lsmtrace_bpf__load(skel);
@@ -173,21 +226,23 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	fprintf(stdout, "Attached, launching executable\n");
+	fprintf(stdout, "Attached, starting execution\n");
+	kill(child_pid, SIGCONT);	
 
-	/* Set up ring buffer polling */
-	ringbuffer = ring_buffer__new(bpf_map__fd(skel->maps.ringbuf), handle_event, NULL, NULL);
-	if (!ringbuffer) {
-		err = -1;
-		fprintf(stderr, "Failed to create ring buffer\n");
-		goto cleanup;
-	}
+
+//	/* Set up ring buffer polling */
+//	ringbuffer = ring_buffer__new(bpf_map__fd(skel->maps.ringbuf), handle_event, NULL, NULL);
+//	if (!ringbuffer) {
+//		err = -1;
+//		fprintf(stderr, "Failed to create ring buffer\n");
+//		goto cleanup;
+//	}
 
 
 	// Trigger program every sec
 	while (!exiting) {
-		/* trigger our BPF program */
-		fprintf(stderr, ".");
+//		/* trigger our BPF program */
+//		fprintf(stderr, ".");
 		sleep(1);
 	}
 

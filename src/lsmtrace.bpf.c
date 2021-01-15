@@ -19,6 +19,8 @@
 #include <bpf/bpf_core_read.h>
 #include "lsmtrace.h"
 
+
+
 #define FILTER_OWN_PID_INT() 			\
 int pid = bpf_get_current_pid_tgid() >> 32;	\
 if (pid != my_pid)				\
@@ -46,7 +48,10 @@ int my_pid = 0;
 //
 //	FILTER_OWN_PID_INT()
 //
-//	bpf_printk("BPF triggered from PID %d.\n", pid);
+//	long pid_tgid = bpf_get_current_pid_tgid();
+//	bpf_printk("BPF trigger my_pid: %d.\n", my_pid);
+//	bpf_printk("BPF trigger pid: %d.\n", pid_tgid >> 32);
+//	bpf_printk("BPF trigger tgid: %d.\n", pid_tgid);
 //
 //	return 0;
 //}
