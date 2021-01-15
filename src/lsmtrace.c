@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <time.h>
+#include <unistd.h>
 #include <sys/resource.h>
 #include <bpf/libbpf.h>
 #include "lsmtrace.h"
@@ -78,12 +79,12 @@ static void bump_memlock_rlimit(void)
 	}
 }
 
-static volatile bool exiting = false;
-
-static void sig_handler(int sig)
-{
-	exiting = true;
-}
+//static volatile bool exiting = false;
+//
+//static void sig_handler(int sig)
+//{
+//	exiting = true;
+//}
 
 static int handle_event(void *ctx, void *data, size_t len)
 {
@@ -135,9 +136,9 @@ int main(int argc, char **argv)
 	/* Bump RLIMIT_MEMLOCK to create BPF maps */
 	bump_memlock_rlimit();
 
-	/* Cleaner handling of Ctrl-C */
-	signal(SIGINT, sig_handler);
-	signal(SIGTERM, sig_handler);
+//	/* Cleaner handling of Ctrl-C */
+//	signal(SIGINT, sig_handler);
+//	signal(SIGTERM, sig_handler);
 
 	/* Load and verify BPF application */
 	skel = lsmtrace_bpf__open();
@@ -146,8 +147,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	/* Parameterize BPF code with minimum duration parameter */
-//	skel->rodata->min_duration_ns = env.min_duration_ms * 1000000ULL;
+	/* ensure BPF program only handles write() syscalls from our process */
+	skel->bss->my_pid = getpid();
 
 	/* Load & verify BPF programs */
 	err = lsmtrace_bpf__load(skel);
@@ -174,18 +175,28 @@ int main(int argc, char **argv)
 	/* Process events */
 	printf("%-8s %-5s %-16s %-7s %-7s %s\n",
 	       "TIME", "EVENT", "COMM", "PID", "PPID", "FILENAME/EXIT CODE");
-	while (!exiting) {
-		err = ring_buffer__poll(ringbuffer, 100 /* timeout, ms */);
-		/* Ctrl-C will cause -EINTR */
-		if (err == -EINTR) {
-			err = 0;
-			break;
-		}
-		if (err < 0) {
-			printf("Error polling perf buffer: %d\n", err);
-			break;
-		}
+
+	// Trigger program every sec
+	for (;;) {
+		/* trigger our BPF program */
+		fprintf(stderr, ".");
+		sleep(1);
 	}
+
+
+
+//	while (!exiting) {
+//		err = ring_buffer__poll(ringbuffer, 100 /* timeout, ms */);
+//		/* Ctrl-C will cause -EINTR */
+//		if (err == -EINTR) {
+//			err = 0;
+//			break;
+//		}
+//		if (err < 0) {
+//			printf("Error polling perf buffer: %d\n", err);
+//			break;
+//		}
+//	}
 
 cleanup:
 	/* Clean up */
