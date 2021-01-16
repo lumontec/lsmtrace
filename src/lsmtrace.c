@@ -226,6 +226,7 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
+	/* Send child cont signal */
 	fprintf(stdout, "Attached, starting execution\n");
 	kill(child_pid, SIGCONT);	
 
