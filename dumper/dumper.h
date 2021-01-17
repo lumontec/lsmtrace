@@ -8,7 +8,7 @@
 char dst[100] = "";
 
 
-static int sdump (const char *fmt, void* arg1, void* arg2, void *arg3) {
+static int sdump (const char *fmt, void* arg1) {
 
 	const char *fmtcp = fmt;
 	long size = 0;

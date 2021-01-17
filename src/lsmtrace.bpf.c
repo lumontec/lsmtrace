@@ -14,11 +14,11 @@
 */
 
 #include "vmlinux.h"
+#include <linux/limits.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
 #include <bpf/bpf_core_read.h>
 #include "lsmtrace.h"
-#include "sdump.h"
 
 #define FILTER_OWN_PID_INT() 			\
 int pid = bpf_get_current_pid_tgid() >> 32;	\
@@ -827,33 +827,26 @@ int BPF_PROG(file_receive, struct file *file)
 }
 
 
-//int my_printf(const char *fmt, ...) {
-////	va_list args;
-////	char buffer[256];
-////	va_start(args, fmt);
-////	vsnprintf (buffer, 255, fmt, args);
-////	va_end(args);
-//	return 0;
-//}
-//
-//static int (*my_printfp)(const char *fmt, ...) = my_printf;
-//
-
-
-
 SEC("lsm/file_open")
 int BPF_PROG(file_open, struct file *file)
 {
 	FILTER_OWN_PID_INT()
 
-	const char *pathname;
+	const struct file *filecp;
+
+//	bpf_probe_read(filecp, sizeof(*file), file);
+
+//	filecp = bpf_ringbuf_reserve(&ringbuf, sizeof(*filecp), ringbuffer_flags);
+//	if (!filecp)
+//		return -1;
+
+//	bpf_ringbuf_submit(filecp, ringbuffer_flags);
+//	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
 
 //	sdump_helper(text, 1);
 	
-	__builtin_dump_struct(file, &sdump_helper);
+//	__builtin_dump_struct(file, &sdump);
 
-//	bpk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
-//	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
 //	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
 //	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
 

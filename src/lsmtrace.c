@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
 //
 
+
 #include <argp.h>
 #include <signal.h>
 #include <stdio.h>
@@ -8,8 +9,9 @@
 #include <unistd.h>
 #include <sys/resource.h>
 #include <bpf/libbpf.h>
-#include "lsmtrace.h"
+//#include "lsmtrace.h"
 #include "lsmtrace.skel.h"
+#include "statedump.h"
 
 static struct env {
 	bool verbose;
@@ -108,38 +110,33 @@ static void sig_childHandler(int sig)
 		fprintf(stdout, "Received signal SIGCONT\n");
 }
 
-//static int handle_event(void *ctx, void *data, size_t len)
-//{
-//	if(len < sizeof(struct process_info)) {
-//		return -1;
+static int handle_event(void *ctx, void *data, size_t len)
+{
+//	sdumplib.dumpFileStruct(data);	
+	return 0;
+
+//	const struct event *e = data;
+//	struct tm *tm;
+//	char ts[32];
+//	time_t t;
+//
+//	time(&t);
+//	tm = localtime(&t);
+//	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
+//
+//	if (e->exit_event) {
+//		printf("%-8s %-5s %-16s %-7d %-7d [%u]",
+//		       ts, "EXIT", e->comm, e->pid, e->ppid, e->exit_code);
+//		if (e->duration_ns)
+//			printf(" (%llums)", e->duration_ns / 1000000);
+//		printf("\n");
+//	} else {
+//		printf("%-8s %-5s %-16s %-7d %-7d %s\n",
+//		       ts, "EXEC", e->comm, e->pid, e->ppid, e->filename);
 //	}
 //
-//	const struct process_info *s = data;
-//	printf("%d\t%d\t%d\t%s\n", s->ppid, s->pid, s->tgid, s->name);
 //	return 0;
-//
-////	const struct event *e = data;
-////	struct tm *tm;
-////	char ts[32];
-////	time_t t;
-////
-////	time(&t);
-////	tm = localtime(&t);
-////	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
-////
-////	if (e->exit_event) {
-////		printf("%-8s %-5s %-16s %-7d %-7d [%u]",
-////		       ts, "EXIT", e->comm, e->pid, e->ppid, e->exit_code);
-////		if (e->duration_ns)
-////			printf(" (%llums)", e->duration_ns / 1000000);
-////		printf("\n");
-////	} else {
-////		printf("%-8s %-5s %-16s %-7d %-7d %s\n",
-////		       ts, "EXEC", e->comm, e->pid, e->ppid, e->filename);
-////	}
-////
-////	return 0;
-//}
+}
 
 
 /* forks waiting for SIGCONT and returns pid */
@@ -174,6 +171,7 @@ static int exec_prog_and_wait(const char **argv)
 
 int main(int argc, char **argv)
 {
+
 	struct ring_buffer *ringbuffer = NULL;
 	struct lsmtrace_bpf *skel;
 	int err;
@@ -194,6 +192,8 @@ int main(int argc, char **argv)
 	signal(SIGTERM, sig_parentHandler);
 
 	fprintf(stdout, "Launching process fork\n");
+
+	printTest();
 
 	int child_pid = exec_prog_and_wait(my_argv);
 
@@ -231,13 +231,13 @@ int main(int argc, char **argv)
 	kill(child_pid, SIGCONT);	
 
 
-//	/* Set up ring buffer polling */
-//	ringbuffer = ring_buffer__new(bpf_map__fd(skel->maps.ringbuf), handle_event, NULL, NULL);
-//	if (!ringbuffer) {
-//		err = -1;
-//		fprintf(stderr, "Failed to create ring buffer\n");
-//		goto cleanup;
-//	}
+	/* Set up ring buffer polling */
+	ringbuffer = ring_buffer__new(bpf_map__fd(skel->maps.ringbuf), handle_event, NULL, NULL);
+	if (!ringbuffer) {
+		err = -1;
+		fprintf(stderr, "Failed to create ring buffer\n");
+		goto cleanup;
+	}
 
 
 	// Trigger program every sec

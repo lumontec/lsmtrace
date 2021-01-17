@@ -6,13 +6,16 @@
 #define TASK_COMM_LEN 16
 #define MAX_FILENAME_LEN 127
 
-#include <linux/limits.h>
-
 struct process_info {
 	int ppid;
 	int pid;
 	int tgid;
 	char name[PATH_MAX];
+};
+
+struct test {
+	struct file filecp;
+	int size;
 };
 
 struct event {
