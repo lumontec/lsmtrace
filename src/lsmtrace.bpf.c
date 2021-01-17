@@ -18,6 +18,7 @@
 #include <bpf/bpf_tracing.h>
 #include <bpf/bpf_core_read.h>
 #include "lsmtrace.h"
+#include "sdump.h"
 
 #define FILTER_OWN_PID_INT() 			\
 int pid = bpf_get_current_pid_tgid() >> 32;	\
@@ -838,40 +839,6 @@ int BPF_PROG(file_receive, struct file *file)
 //static int (*my_printfp)(const char *fmt, ...) = my_printf;
 //
 
-#define __x86_64__
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-
-const char text[100] = "%s";
-char dst[100] = "1";
-//const char *dst = text1;
-
-static int sdump_helper (const char *fmt, ...) {
-//	va_list args;
-//	strncpy ( dst, fmt, 10 );
-	__builtin_memcpy(dst, fmt, 100);
-	bpf_printk("%s", dst);
-//	bpf_trace_printk(text, dst);
-//	char buffer[256];
-//	va_start(args, fmt);
-//	vsnprintf (buffer, 255, fmt, args);
-//	bpf_printk("ciao:%d", args);
-//	va_end(args);
-//	bpf_trace_printk(text, *fmt);
-	return 0;
-}
-
-
-//static int getsize (const char *fmt) {
-//	int size = 0;
-//	for (int i=0; i++; i<100) {
-//		if (*fmt == 0) {
-//			return size
-//		}
-//	}
-//	return -1; 
-//}
 
 
 SEC("lsm/file_open")
