@@ -2,15 +2,12 @@
 #define __SDUMP_H
 
 #include <stdio.h>
-#include "lsmtrace.h"
+//#include "lsmtrace.h"
 
-/* Dump file struct */
-int dumpFileStruct( void*, size_t);
+/* Dump typed event */
+int dumpEvent( void*, size_t);
 
-/* Test print ciao */
 int printTest();
-
-
 
 
 

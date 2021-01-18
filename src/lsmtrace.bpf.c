@@ -18,7 +18,7 @@
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
 #include <bpf/bpf_core_read.h>
-#include "lsmtrace.h"
+#include "events.h"
 
 #define FILTER_OWN_PID_INT() 			\
 int pid = bpf_get_current_pid_tgid() >> 32;	\
@@ -832,16 +832,31 @@ int BPF_PROG(file_open, struct file *file)
 {
 	FILTER_OWN_PID_INT()
 	
-	struct test *prova;
+	struct qstr *qstr_cp = &file->f_path.dentry->d_name;
+	struct qstr_Event *qevt;
 
-	prova = bpf_ringbuf_reserve(&ringbuf, sizeof(*prova), ringbuffer_flags);
-	if (!prova)
+	qevt = bpf_ringbuf_reserve(&ringbuf, sizeof(*qevt), ringbuffer_flags);
+	if (!qevt)
 		return -1;
+	
+	bpf_probe_read_kernel(&qevt->qstr_s, sizeof(qstr_cp), qstr_cp);
+	qevt->super.etype = STRUCT_QSTR;
+	
+	bpf_ringbuf_submit(qevt, ringbuffer_flags);
 
-	prova->argvalue = file->f_version; 
-	prova->setvalue=10; 
 
-	bpf_ringbuf_submit(prova, ringbuffer_flags);
+//	struct test *prova;
+//
+//	prova = bpf_ringbuf_reserve(&ringbuf, sizeof(*prova), ringbuffer_flags);
+//	if (!prova)
+//		return -1;
+//
+//	prova->argvalue = file->f_version; 
+//	prova->setvalue=10; 
+//
+//	bpf_ringbuf_submit(prova, ringbuffer_flags);
+
+
 //	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
 
 //	sdump_helper(text, 1);

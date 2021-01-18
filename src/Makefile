@@ -74,10 +74,11 @@ $(patsubst %,$(OUTPUT)/%.o,$(APPS)): %.o: %.skel.h
 # Build statedump obj
 $(OUTPUT)/statedump.o: statedump.c statedump.h | $(OUTPUT)
 	$(call msg,CC,$@)
-	$(Q)$(CC) $(CFLAGS) -c $(filter %.c,$^) -o $@
+	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
+#	$(Q)$(CC) $(CFLAGS) -c $(filter %.c,$^) -o $@
 
 # Build lsmtrace obj
-$(OUTPUT)/lsmtrace.o: lsmtrace.c lsmtrace.h | $(OUTPUT)
+$(OUTPUT)/lsmtrace.o: lsmtrace.c | $(OUTPUT)
 	$(call msg,CC,$@)
 	$(Q)$(CC) $(CFLAGS) $(INCLUDES) -c $(filter %.c,$^) -o $@
 

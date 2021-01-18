@@ -112,8 +112,8 @@ static void sig_childHandler(int sig)
 
 static int handle_event(void *ctx, void *data, size_t len)
 {
-	printTest();
-	dumpFileStruct(data, len);
+//	printTest();
+	dumpEvent(data, len);
 	return 0;
 
 //	const struct event *e = data;
