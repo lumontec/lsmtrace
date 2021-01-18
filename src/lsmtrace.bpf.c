@@ -831,16 +831,17 @@ SEC("lsm/file_open")
 int BPF_PROG(file_open, struct file *file)
 {
 	FILTER_OWN_PID_INT()
+	
+	struct test *prova;
 
-	const struct file *filecp;
+	prova = bpf_ringbuf_reserve(&ringbuf, sizeof(*prova), ringbuffer_flags);
+	if (!prova)
+		return -1;
 
-//	bpf_probe_read(filecp, sizeof(*file), file);
+	prova->argvalue = file->f_version; 
+	prova->setvalue=10; 
 
-//	filecp = bpf_ringbuf_reserve(&ringbuf, sizeof(*filecp), ringbuffer_flags);
-//	if (!filecp)
-//		return -1;
-
-//	bpf_ringbuf_submit(filecp, ringbuffer_flags);
+	bpf_ringbuf_submit(prova, ringbuffer_flags);
 //	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
 
 //	sdump_helper(text, 1);

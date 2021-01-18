@@ -10,12 +10,12 @@ struct process_info {
 	int ppid;
 	int pid;
 	int tgid;
-	char name[PATH_MAX];
+//	char name[PATH_MAX];
 };
 
 struct test {
-	struct file filecp;
-	int size;
+	int argvalue;
+	int setvalue;
 };
 
 struct event {
@@ -25,7 +25,7 @@ struct event {
 	unsigned long long duration_ns;
 	char comm[TASK_COMM_LEN];
 	char filename[MAX_FILENAME_LEN];
-	bool exit_event;
+//	bool exit_event;
 };
 
 #endif /* __LMSTRACE_H */

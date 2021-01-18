@@ -2,6 +2,7 @@
 #define __SDUMP_H
 
 #include <stdio.h>
+#include "lsmtrace.h"
 
 /* Dump file struct */
 int dumpFileStruct( void*, size_t);

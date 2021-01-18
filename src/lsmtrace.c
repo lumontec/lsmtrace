@@ -112,7 +112,8 @@ static void sig_childHandler(int sig)
 
 static int handle_event(void *ctx, void *data, size_t len)
 {
-//	sdumplib.dumpFileStruct(data);	
+	printTest();
+	dumpFileStruct(data, len);
 	return 0;
 
 //	const struct event *e = data;
@@ -240,27 +241,28 @@ int main(int argc, char **argv)
 	}
 
 
-	// Trigger program every sec
+//	// Trigger program every sec
+//	while (!exiting) {
+////		/* trigger our BPF program */
+////		fprintf(stderr, ".");
+//		sleep(1);
+//	}
+
+
 	while (!exiting) {
-//		/* trigger our BPF program */
-//		fprintf(stderr, ".");
-		sleep(1);
+
+		err = ring_buffer__poll(ringbuffer, 100 /* timeout, ms */);
+		/* Ctrl-C will cause -EINTR */
+		if (err == -EINTR) {
+			err = 0;
+			break;
+		}
+		if (err < 0) {
+			printf("Error polling perf buffer: %d\n", err);
+			break;
+		}
 	}
 
-	fprintf(stdout, "Closing tracer\n");
-
-//	while (!exiting) {
-//		err = ring_buffer__poll(ringbuffer, 100 /* timeout, ms */);
-//		/* Ctrl-C will cause -EINTR */
-//		if (err == -EINTR) {
-//			err = 0;
-//			break;
-//		}
-//		if (err < 0) {
-//			printf("Error polling perf buffer: %d\n", err);
-//			break;
-//		}
-//	}
 
 cleanup:
 	/* Clean up */
