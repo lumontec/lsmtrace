@@ -19,25 +19,8 @@
 #include <bpf/bpf_tracing.h>
 #include <bpf/bpf_core_read.h>
 #include "events.h"
+#include "bpf_helpers.h"
 
-#define FILTER_OWN_PID_INT() 			\
-int pid = bpf_get_current_pid_tgid() >> 32;	\
-if (pid != my_pid)				\
-	return 0;				
-
-#define FILTER_OWN_PID_VOID() 			\
-int pid = bpf_get_current_pid_tgid() >> 32;	\
-if (pid != my_pid)				\
-	return;					
-
-
-struct {
-	__uint(type, BPF_MAP_TYPE_RINGBUF);
-	__uint(max_entries, 1 << 24);
-} ringbuf SEC(".maps");
-
-long ringbuffer_flags = 0;
-int my_pid = 0;
 
 
 //SEC("tp/syscalls/sys_enter_write")
@@ -831,18 +814,67 @@ SEC("lsm/file_open")
 int BPF_PROG(file_open, struct file *file)
 {
 	FILTER_OWN_PID_INT()
-	
-	struct qstr *qstr_cp = &file->f_path.dentry->d_name;
-	struct qstr_Event *qevt;
 
-	qevt = bpf_ringbuf_reserve(&ringbuf, sizeof(*qevt), ringbuffer_flags);
-	if (!qevt)
-		return -1;
-	
-	bpf_probe_read_kernel(&qevt->qstr_s, sizeof(qstr_cp), qstr_cp);
-	qevt->super.etype = STRUCT_QSTR;
-	
-	bpf_ringbuf_submit(qevt, ringbuffer_flags);
+	DUMP_FUNC(file_open)
+	DUMP_STRUCT( file, STRUCT_FILE, file )
+	DUMP_STRUCT( qstr, STRUCT_QSTR, &file->f_path.dentry->d_name )
+	DUMP_STRUCT( dentry, STRUCT_DENTRY, &file->f_path.dentry )
+
+
+
+//	static struct btf_ptr p = { };
+//	p.type_id = bpf_core_type_id_kernel(struct file);
+//	p.ptr = file;
+//	char *str;
+//
+//	int ret;
+//	ret = bpf_snprintf_btf(str, 2048, &p, sizeof(p), 0);
+//
+//	bpf_printk("test %s:", str);
+
+
+
+
+
+
+
+//	struct func_call_Event *evt;  						
+//	static char msg[MAX_MSG_SIZE] = "messaggio";
+//
+//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);	
+//										
+//	if (!evt)								
+//		return -1;							
+//										
+//	evt->super.etype = FUNCTION_CALL;
+//	bpf_probe_read_str(evt->msg, sizeof(evt->msg), msg);
+//
+//
+//	bpf_printk("evt->msg: %s", evt->msg);
+//
+//	bpf_ringbuf_submit(evt, ringbuffer_flags);				
+//
+//	return 0;								
+
+
+
+
+
+
+
+
+
+//	struct qstr *qstr_cp = &file->f_path.dentry->d_name;
+//	struct qstr_Event *qevt;
+//
+//	qevt = bpf_ringbuf_reserve(&ringbuf, sizeof(*qevt), ringbuffer_flags);
+//	if (!qevt)
+//		return -1;
+//	
+//	bpf_probe_read_kernel(&qevt->qstr_s, sizeof(qstr_cp), qstr_cp);
+//	qevt->super.etype = STRUCT_QSTR;
+//	
+//	bpf_ringbuf_submit(qevt, ringbuffer_flags);
 
 
 //	struct test *prova;
