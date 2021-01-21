@@ -10,6 +10,7 @@
 #include <sys/resource.h>
 #include <bpf/libbpf.h>
 //#include "lsmtrace.h"
+#include <linux/btf.h>
 #include "lsmtrace.skel.h"
 #include "statedump.h"
 

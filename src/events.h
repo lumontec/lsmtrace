@@ -27,7 +27,8 @@ typedef struct Event {
 
 typedef struct func_call_Event {
 	Event super;
-	char msg[MAX_MSG_SIZE];
+	char name[MAX_MSG_SIZE];
+	char args[MAX_MSG_SIZE];
 } func_call_Event;
 
 
@@ -39,13 +40,11 @@ typedef struct file_struct_Event {
 	char msg[MAX_MSG_SIZE];
 } file_struct_Event;
 
-
 typedef struct dentry_struct_Event {
 	Event super;
 	struct dentry dentry;		
 	char msg[MAX_MSG_SIZE];
 } dentry_struct_Event;
-
 
 typedef struct qstr_struct_Event {
 	Event super;

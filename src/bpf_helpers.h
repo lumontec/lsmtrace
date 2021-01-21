@@ -32,10 +32,11 @@ char func_call_label[MAX_MSG_SIZE] = "FUNCTION_CALL";
 char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 
 
-#define DUMP_FUNC(FNAME)									\
+#define DUMP_FUNC(FNAME, ...)									\
 {												\
 	struct func_call_Event *evt;  								\
-	static char FNAME##msg[MAX_MSG_SIZE] = #FNAME;						\
+	static char FNAME##name[MAX_MSG_SIZE] = #FNAME;						\
+	static char FNAME##args[MAX_MSG_SIZE] = #__VA_ARGS__;					\
 												\
 	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			\
 												\
@@ -44,7 +45,8 @@ char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 												\
 	evt->super.etype = FUNCTION_CALL;							\
 	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), func_call_label);	\
-	bpf_probe_read_str(evt->msg, sizeof(evt->msg), FNAME##msg);				\
+	bpf_probe_read_str(evt->name, sizeof(evt->name), FNAME##name);				\
+	bpf_probe_read_str(evt->args, sizeof(evt->args), FNAME##args);				\
 												\
 	bpf_ringbuf_submit(evt, ringbuffer_flags);						\
 }

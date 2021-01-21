@@ -14,12 +14,13 @@
 */
 
 #include "vmlinux.h"
-#include <linux/limits.h>
+//#include <linux/limits.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
 #include <bpf/bpf_core_read.h>
-#include "events.h"
 #include "bpf_helpers.h"
+#include "events.h"
+
 
 
 
@@ -810,90 +811,17 @@ int BPF_PROG(file_receive, struct file *file)
 }
 
 
+
 SEC("lsm/file_open")
 int BPF_PROG(file_open, struct file *file)
 {
 	FILTER_OWN_PID_INT()
 
-	DUMP_FUNC(file_open)
-	DUMP_STRUCT( file, STRUCT_FILE, file )
-	DUMP_STRUCT( qstr, STRUCT_QSTR, &file->f_path.dentry->d_name )
-	DUMP_STRUCT( dentry, STRUCT_DENTRY, &file->f_path.dentry )
+	DUMP_FUNC(file_open, struct file *file)
 
-
-
-//	static struct btf_ptr p = { };
-//	p.type_id = bpf_core_type_id_kernel(struct file);
-//	p.ptr = file;
-//	char *str;
-//
-//	int ret;
-//	ret = bpf_snprintf_btf(str, 2048, &p, sizeof(p), 0);
-//
-//	bpf_printk("test %s:", str);
-
-
-
-
-
-
-
-//	struct func_call_Event *evt;  						
-//	static char msg[MAX_MSG_SIZE] = "messaggio";
-//
-//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);	
-//										
-//	if (!evt)								
-//		return -1;							
-//										
-//	evt->super.etype = FUNCTION_CALL;
-//	bpf_probe_read_str(evt->msg, sizeof(evt->msg), msg);
-//
-//
-//	bpf_printk("evt->msg: %s", evt->msg);
-//
-//	bpf_ringbuf_submit(evt, ringbuffer_flags);				
-//
-//	return 0;								
-
-
-
-
-
-
-
-
-
-//	struct qstr *qstr_cp = &file->f_path.dentry->d_name;
-//	struct qstr_Event *qevt;
-//
-//	qevt = bpf_ringbuf_reserve(&ringbuf, sizeof(*qevt), ringbuffer_flags);
-//	if (!qevt)
-//		return -1;
-//	
-//	bpf_probe_read_kernel(&qevt->qstr_s, sizeof(qstr_cp), qstr_cp);
-//	qevt->super.etype = STRUCT_QSTR;
-//	
-//	bpf_ringbuf_submit(qevt, ringbuffer_flags);
-
-
-//	struct test *prova;
-//
-//	prova = bpf_ringbuf_reserve(&ringbuf, sizeof(*prova), ringbuffer_flags);
-//	if (!prova)
-//		return -1;
-//
-//	prova->argvalue = file->f_version; 
-//	prova->setvalue=10; 
-//
-//	bpf_ringbuf_submit(prova, ringbuffer_flags);
-
-
-//	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
-
-//	sdump_helper(text, 1);
-	
-//	__builtin_dump_struct(file, &sdump);
+//	DUMP_STRUCT(file, 	STRUCT_FILE, 	file 				)
+//	DUMP_STRUCT(qstr, 	STRUCT_QSTR, 	&file->f_path.dentry->d_name 	)
+//	DUMP_STRUCT(dentry, 	STRUCT_DENTRY, 	&file->f_path.dentry 		)
 
 //	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
 //	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
