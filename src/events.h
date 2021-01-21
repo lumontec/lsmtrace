@@ -13,7 +13,7 @@ enum Event_type {
 
 	FUNCTION_CALL = 0,
 
-	MEMBER_INT = 10,
+	MEMBER_UINT = 10,
 	MEMBER_STR = 11,
 
 	STRUCT_FILE = 100,
@@ -40,11 +40,11 @@ typedef struct func_call_Event {
 
 /* Struct member dump events */
 
-typedef struct int_member_Event {
+typedef struct uint_member_Event {
 	Event super;
-	int member;	
+	unsigned int member;	
 	char msg[MAX_MSG_SIZE];
-} int_member_Event;
+} uint_member_Event;
 
 
 typedef struct str_member_Event {

@@ -6,21 +6,37 @@
 int dumpFileStruct(struct file fl, size_t len);
 
 
+int printFunCallEvt(const struct Event *evt) {
+	const func_call_Event* tevt = (func_call_Event*) evt;
+	printf("\n-> %s: ", evt->label);
+	printf("-> %s", tevt->name);
+	printf("( %s", tevt->args);
+	printf(" )\n");
+	return 0;
+}
+
+int printUintMemberEvt(const struct Event *evt) {
+	const uint_member_Event* tevt = (uint_member_Event*) evt;
+//	printf("   %s: ", evt->label);
+	printf("     %s = ", tevt->msg);
+	printf("%u\n", tevt->member);
+	return 0;
+}
+
+
 /* Dump typed event */
 int dumpEvent(void* data, size_t len) {
 	
 	const struct Event *evt = data;
 
-	printf("\n---> %s: ", evt->label);
 
 	switch (evt->etype)
 	{
 		case FUNCTION_CALL: {
-			const func_call_Event* tevt = (func_call_Event*) evt;
-			printf("-> %s", tevt->name);
-			printf("( %s", tevt->args);
-			printf(" )\n");
-			break;
+			return printFunCallEvt(evt);
+		}
+		case MEMBER_UINT: {
+			return printUintMemberEvt(evt);
 		}
 		case STRUCT_FILE: {
 			const file_struct_Event* tevt = (file_struct_Event*) evt;
@@ -48,6 +64,7 @@ int dumpEvent(void* data, size_t len) {
 
 	return 0;
 }
+
 
 
 
