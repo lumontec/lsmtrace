@@ -5,14 +5,20 @@
 
 #include "vmlinux.h"
 
-#define MAX_LABEL_SIZE 50
+#define MAX_LABEL_SIZE 100
 #define MAX_MSG_SIZE 50
+#define MAX_STR_SIZE 50
 
 enum Event_type {
+
 	FUNCTION_CALL = 0,
-	STRUCT_FILE = 1,
-	STRUCT_DENTRY = 2,
-	STRUCT_QSTR = 3,
+
+	MEMBER_INT = 10,
+	MEMBER_STR = 11,
+
+	STRUCT_FILE = 100,
+	STRUCT_DENTRY = 101,
+	STRUCT_QSTR = 102,
 };
 
 /* Generic event interface */
@@ -30,6 +36,22 @@ typedef struct func_call_Event {
 	char name[MAX_MSG_SIZE];
 	char args[MAX_MSG_SIZE];
 } func_call_Event;
+
+
+/* Struct member dump events */
+
+typedef struct int_member_Event {
+	Event super;
+	int member;	
+	char msg[MAX_MSG_SIZE];
+} int_member_Event;
+
+
+typedef struct str_member_Event {
+	Event super;
+	char member[MAX_STR_SIZE];
+	char msg[MAX_MSG_SIZE];
+} str_member_Event;
 
 
 /* Struct dump events */
@@ -51,7 +73,6 @@ typedef struct qstr_struct_Event {
 	struct qstr qstr;
 	char msg[MAX_MSG_SIZE];
 } qstr_struct_Event;
-
 
 
 

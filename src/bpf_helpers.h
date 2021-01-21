@@ -28,28 +28,94 @@ long ringbuffer_flags = 0;
 int my_pid = 0;
 
 
-char func_call_label[MAX_MSG_SIZE] = "FUNCTION_CALL";
 char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 
 
-#define DUMP_FUNC(FNAME, ...)									\
-{												\
-	struct func_call_Event *evt;  								\
-	static char FNAME##name[MAX_MSG_SIZE] = #FNAME;						\
-	static char FNAME##args[MAX_MSG_SIZE] = #__VA_ARGS__;					\
-												\
-	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			\
-												\
-	if (!evt)										\
-		return -1;									\
-												\
-	evt->super.etype = FUNCTION_CALL;							\
-	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), func_call_label);	\
-	bpf_probe_read_str(evt->name, sizeof(evt->name), FNAME##name);				\
-	bpf_probe_read_str(evt->args, sizeof(evt->args), FNAME##args);				\
-												\
-	bpf_ringbuf_submit(evt, ringbuffer_flags);						\
+static int dump_func(const char *fname, const char *fargs) {
+
+	struct func_call_Event *evt; 								
+	char func_call_label[] = "FUNCTION_CALL";
+
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
+
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = FUNCTION_CALL;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), func_call_label);	
+	bpf_probe_read_str(evt->name, sizeof(evt->name), fname);				
+	bpf_probe_read_str(evt->args, sizeof(evt->args), fargs);				
+
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
 }
+
+
+/* Dirty hack to work around libbpf lack of string locals */
+#define DUMP_FUNC(FNAME, ...) {									\
+	char func_call_name[] = #FNAME;								\
+	char func_call_args[] = #__VA_ARGS__;							\
+	dump_func(func_call_name, func_call_args);						\
+}	
+
+
+
+///* Global herlper functions, allow for local string definition */
+//static int dump_func () {
+//
+//	struct func_call_Event *evt;  								
+//	char func_call_label[MAX_LABEL_SIZE] = "FUNCTION_CALL";
+//
+//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			
+//	if (!evt)										
+//		return -1;									
+//												
+//	evt->super.etype = FUNCTION_CALL;							
+//	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), func_call_label);	
+////	bpf_probe_read_str(evt->name, sizeof(evt->name), fname);				
+////	bpf_probe_read_str(evt->args, sizeof(evt->args), fargs);				
+//												
+//	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+//
+//	return 0;
+//}
+//
+											\
+
+//#define DUMP_MEMBER_INT(MPTR)		 							\
+//{												\
+//	struct int_member_Event *evt; 								\
+//												\
+//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			\
+//												\
+//	if (!evt)										\
+//		return -1;									\
+//												\
+//	evt->super.etype = MEMBER_INT;								\
+//	bpf_probe_read_kernel(&evt->member, sizeof(evt->member), MPTR);				\
+//												\
+//	bpf_ringbuf_submit(evt, ringbuffer_flags);						\
+//}
+
+
+//#define DUMP_MEMBER_STR(MPTR)		 							\
+//{												\
+//	struct int_member_Event *evt; 								\
+//												\
+//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			\
+//												\
+//	if (!evt)										\
+//		return -1;									\
+//												\
+//	evt->super.etype = MEMBER_STR;								\
+//	bpf_probe_read_kernel(&evt->member, sizeof(evt->member), MPTR);				\
+//												\
+//	bpf_ringbuf_submit(evt, ringbuffer_flags);						\
+//}
+//
+
 
 
 #define DUMP_STRUCT(STYPE, ETYPE, SPTR) 							\
