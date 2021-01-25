@@ -23,6 +23,15 @@ int printUintMemberEvt(const struct Event *evt) {
 	return 0;
 }
 
+int printStrMemberEvt(const struct Event *evt) {
+	const str_member_Event* tevt = (str_member_Event*) evt;
+//	printf("   %s: ", evt->label);
+	printf("     %s = ", tevt->msg);
+	printf("%s\n", tevt->member);
+	return 0;
+}
+
+
 
 /* Dump typed event */
 int dumpEvent(void* data, size_t len) {
@@ -37,6 +46,9 @@ int dumpEvent(void* data, size_t len) {
 		}
 		case MEMBER_UINT: {
 			return printUintMemberEvt(evt);
+		}
+		case MEMBER_STR: {
+			return printStrMemberEvt(evt);
 		}
 		case STRUCT_FILE: {
 			const file_struct_Event* tevt = (file_struct_Event*) evt;
