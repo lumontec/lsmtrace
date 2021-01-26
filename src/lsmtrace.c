@@ -14,39 +14,42 @@
 #include "lsmtrace.skel.h"
 #include "statedump.h"
 
-static struct env {
-	bool verbose;
-	long min_duration_ms;
-} env;
 
-
-//const char    *my_argv[64] = {"/foo/bar/baz" , "-foo" , "-bar" , NULL};
-const char    *my_argv[64] = {"/bin/ls" , "/home", NULL};
-
-
-
-const char *argp_program_version = "lsmtrace 0.1";
+/* Argp info */
+const char *argp_program_version = "lsmtrace version 0.1";
 const char *argp_program_bug_address = "<https://github.com/lumontec/lsmtrace.git/issues>";
-const char argp_program_doc[] =
-"BPF lsmtrace application.\n"
+const char argp_program_doc[] = 
+"\nLinux Security Modules tracer\n"
 "\n"
-"Trace lsm hook calls triggered by the process\n"
+"Trace lsm hook calls triggered by process\n"
 "\n"
-"USAGE: ./lsmtrace [-d <min-duration-ms>] [-v]\n";
+"Options:\n";
+const char argp_program_args[] = "my_executable";
 
+/* Argp options */
 static const struct argp_option opts[] = {
 	{ "verbose", 'v', NULL, 0, "Verbose debug output" },
-	{ "other..", 'o', "meaning", 0, "Full description" },
+	{ "filter", 'f', "<cathegory>", 0, "Filter lsm hook cathegory, available {all|file|inode}" },
 	{},
 };
 
+/* Argp arguments */
+static struct env {
+	bool verbose;
+	long min_duration_ms;
+	const char *cathegory;
+} env;
+
+const char    *my_argv[64] = {"/bin/ls" , "/home", NULL};
+
+/* Argp parse */
 static error_t parse_arg(int key, char *arg, struct argp_state *state)
 {
 	switch (key) {
 	case 'v':
 		env.verbose = true;
 		break;
-	case 'o':
+	case 'f':
 //		errno = 0;
 //		env.min_duration_ms = strtol(arg, NULL, 10);
 //		if (errno || env.min_duration_ms <= 0) {
@@ -57,17 +60,26 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 	case ARGP_KEY_ARG:
 		argp_usage(state);
 		break;
+   	case ARGP_KEY_NO_ARGS:
+      		argp_usage (state);
+		break;
 	default:
 		return ARGP_ERR_UNKNOWN;
 	}
 	return 0;
 }
 
+/* Argp config */
 static const struct argp argp = {
 	.options = opts,
 	.parser = parse_arg,
+	.args_doc = argp_program_args,
 	.doc = argp_program_doc,
 };
+
+
+
+/* Libbpf callback handlers */
 
 static int libbpf_print_fn(enum libbpf_print_level level, const char *format, va_list args)
 {
@@ -89,6 +101,16 @@ static void bump_memlock_rlimit(void)
 	}
 }
 
+static int handle_event(void *ctx, void *data, size_t len)
+{
+	dumpEvent(data, len);
+	return 0;
+}
+
+
+
+/* Signal handlers */
+
 static volatile bool exiting = false;
 
 static void sig_parentHandler(int sig)
@@ -109,35 +131,6 @@ static void sig_childHandler(int sig)
 {
 	if (SIGCONT == sig)
 		fprintf(stdout, "Received signal SIGCONT\n");
-}
-
-static int handle_event(void *ctx, void *data, size_t len)
-{
-//	printTest();
-	dumpEvent(data, len);
-	return 0;
-
-//	const struct event *e = data;
-//	struct tm *tm;
-//	char ts[32];
-//	time_t t;
-//
-//	time(&t);
-//	tm = localtime(&t);
-//	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
-//
-//	if (e->exit_event) {
-//		printf("%-8s %-5s %-16s %-7d %-7d [%u]",
-//		       ts, "EXIT", e->comm, e->pid, e->ppid, e->exit_code);
-//		if (e->duration_ns)
-//			printf(" (%llums)", e->duration_ns / 1000000);
-//		printf("\n");
-//	} else {
-//		printf("%-8s %-5s %-16s %-7d %-7d %s\n",
-//		       ts, "EXEC", e->comm, e->pid, e->ppid, e->filename);
-//	}
-//
-//	return 0;
 }
 
 
@@ -195,8 +188,6 @@ int main(int argc, char **argv)
 
 	fprintf(stdout, "Launching process fork\n");
 
-	printTest();
-
 	int child_pid = exec_prog_and_wait(my_argv);
 
 	fprintf(stdout, "Parent pid: %d\n", getpid());
@@ -240,15 +231,6 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Failed to create ring buffer\n");
 		goto cleanup;
 	}
-
-
-//	// Trigger program every sec
-//	while (!exiting) {
-////		/* trigger our BPF program */
-////		fprintf(stderr, ".");
-//		sleep(1);
-//	}
-
 
 	while (!exiting) {
 

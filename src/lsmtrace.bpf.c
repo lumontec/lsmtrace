@@ -816,13 +816,14 @@ SEC("lsm/file_open")
 int BPF_PROG(file_open, struct file *file)
 {
 	FILTER_OWN_PID_INT()
-	
+
+	bpf_printk("lsm_hook: file->f_mode: %u\n", file->f_mode);
+
 	DUMP_FUNC(file_open, struct file *file)
+	DUMP_MEMBER_UINT(file->f_mode)
 	DUMP_MEMBER_UINT(file->f_path.dentry->d_flags)
 	DUMP_MEMBER_STR(file->f_path.dentry->d_name.name)
 
-	bpf_printk("lsm_hook: file: file_open: %s\n", file->f_path.dentry->d_name.name);
-	
 //	DUMP_STRUCT(file, 	STRUCT_FILE, 	file 				)
 //	DUMP_STRUCT(qstr, 	STRUCT_QSTR, 	&file->f_path.dentry->d_name 	)
 //	DUMP_STRUCT(dentry, 	STRUCT_DENTRY, 	&file->f_path.dentry 		)
