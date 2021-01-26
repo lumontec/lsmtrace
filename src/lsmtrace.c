@@ -27,6 +27,7 @@ const char argp_program_args[] = "my_exec -a 'my_exec_arg1' ..";
 static const struct argp_option opts[] = {
 	{ "verbose", 'v', NULL, 0, "Verbose debug output" },
 	{ "filter", 'f', "<cathegory>", 0, "Filter lsm hook cathegory, available {all|file|inode}" },
+	{ "output", 'o', "<output>", 0, "Redirect output to file" },
 	{ "arg", 'a', "<executable_arg>", 0, "Executable command argument" },
 	{},
 };
@@ -40,7 +41,8 @@ static struct argp_args {
 
 static int argcnt = 1;
 const char    *my_exec_argv[63] = {}; // {"/bin/ls" ,"-lath", "/home", NULL};
-const char    *my_exec_path = ""; // {"/bin/ls" ,"-lath", "/home", NULL};
+const char    *my_exec_path = ""; 
+const char    *output_path = ""; 
 
 /* Argp parse */
 static error_t parse_arg(int key, char *arg, struct argp_state *state)
@@ -62,18 +64,20 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 		} 
 		fprintf(stderr, "no option found: %s\n", arg);
 		break;
+	case 'o':
+		fprintf(stdout, "saving output on file: %s\n", arg);
+		output_path = arg;
+		break;
 	case 'a':
-		fprintf(stdout, "arg option found: %s\n", arg);
 		my_exec_argv[argcnt] = arg; 
 		my_exec_argv[argcnt+1] = NULL; // Set next to NULL
 		argcnt += 1;
 		break;
 	case ARGP_KEY_ARG:
-		fprintf(stdout, "exec option found: %s\n", arg);
 		my_exec_path = arg; // Set next to NULL
 		break;
    	case ARGP_KEY_NO_ARGS:
-		fprintf(stderr, "No executable name supplied");
+		fprintf(stderr, "no executable name supplied");
       		argp_usage (state);
 		break;
 	default:
@@ -130,10 +134,10 @@ static void sig_parentHandler(int sig)
 	if (exiting) return;
 
 	if (SIGINT == sig)
-		fprintf(stdout, "Received signal SIGINT\n");
+		fprintf(stdout, "\nReceived signal SIGINT\n");
 
 	if (SIGTERM == sig)
-		fprintf(stdout, "Received signal SIGTERM\n");
+		fprintf(stdout, "\nReceived signal SIGTERM\n");
 
 	exiting = true;
 }
@@ -141,7 +145,7 @@ static void sig_parentHandler(int sig)
 static void sig_childHandler(int sig)
 {
 	if (SIGCONT == sig)
-		fprintf(stdout, "Received signal SIGCONT\n");
+		fprintf(stdout, "\nReceived signal SIGCONT\n");
 }
 
 
@@ -161,12 +165,16 @@ static int exec_prog_and_wait(const char *path, const char **argv)
 	/* child process */
      	if (my_pid == 0)
         {
-		fprintf(stdout, "Forked child process, paused waiting for SIGCONT\n");
+		fprintf(stdout, "Launching child process: %s ", path);
+		for (int i=1; argv[i] !=NULL; i++){
+			fprintf(stdout, " %s", argv[i]);
+		};
+//		fprintf(stdout, "\nPaused waiting for SIGCONT ..\n");
+
 		signal(SIGCONT, sig_childHandler);
 		pause();
-		fprintf(stdout, "Forked child process, executing: %s\n", path);
 		if (-1 == execve(path, (char **)argv , NULL)) {
-			perror("child process execve failed [%m]");
+			perror("child process execve failed");
 			exit(1);
 		}
 		exit(0);
@@ -198,12 +206,10 @@ int main(int argc, char **argv)
 	signal(SIGINT, sig_parentHandler);
 	signal(SIGTERM, sig_parentHandler);
 
-	fprintf(stdout, "Launching process fork\n");
-
 	int child_pid = exec_prog_and_wait(my_exec_path, my_exec_argv);
 
-	fprintf(stdout, "Parent pid: %d\n", getpid());
-	fprintf(stdout, "Child pid: %d\n", child_pid);
+//	fprintf(stdout, "Parent pid: %d\n", getpid());
+//	fprintf(stdout, "Child pid: %d\n", child_pid);
 
 	/* Load and verify BPF application */
 	skel = lsmtrace_bpf__open();
