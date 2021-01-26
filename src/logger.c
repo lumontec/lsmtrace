@@ -1,0 +1,31 @@
+#include "logger.h"
+#include <stdarg.h>
+
+bool verbose = false;
+
+void setLoggerVerbose(bool setting) {
+    verbose = setting;
+}
+
+/* logging */
+int log_info(FILE *f, const char *fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	int ret = vfprintf(f, fmt, args);
+	va_end(args);
+
+	return ret;
+}
+
+int log_verb(FILE *f, const char* fmt, ...) {
+	if (!verbose)
+		return 0;
+	va_list args;
+	va_start(args, fmt);
+	int ret = vfprintf(f, fmt, args);
+	va_end(args);
+
+	return ret;
+}
+
+

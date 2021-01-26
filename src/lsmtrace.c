@@ -10,6 +10,7 @@
 #include <linux/btf.h>
 #include "lsmtrace.skel.h"
 #include "statedump.h"
+#include "logger.h"
 
 
 /* Argp info */
@@ -44,12 +45,14 @@ const char    *my_exec_argv[63] = {}; // {"/bin/ls" ,"-lath", "/home", NULL};
 const char    *my_exec_path = ""; 
 const char    *output_path = ""; 
 
+
 /* Argp parse */
 static error_t parse_arg(int key, char *arg, struct argp_state *state)
 {
 	switch (key) {
 	case 'v':
 		argp_args.verbose = true;
+		setLoggerVerbose(true);
 		break;
 	case 'f':
 		if (strcmp(arg, "file") == 0) 
@@ -62,10 +65,10 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 			argp_args.cathegory = "inode";
 			break;
 		} 
-		fprintf(stderr, "no option found: %s\n", arg);
+		log_info(stderr, "no option found: %s\n", arg);
 		break;
 	case 'o':
-		fprintf(stdout, "saving output on file: %s\n", arg);
+		log_info(stdout, "saving output on file: %s\n", arg);
 		output_path = arg;
 		break;
 	case 'a':
@@ -77,7 +80,7 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 		my_exec_path = arg; // Set next to NULL
 		break;
    	case ARGP_KEY_NO_ARGS:
-		fprintf(stderr, "no executable name supplied");
+		log_info(stderr, "no executable name supplied");
       		argp_usage (state);
 		break;
 	default:
@@ -112,7 +115,7 @@ static void bump_memlock_rlimit(void)
 	};
 
 	if (setrlimit(RLIMIT_MEMLOCK, &rlim_new)) {
-		fprintf(stderr, "Failed to increase RLIMIT_MEMLOCK limit!\n");
+		log_info(stderr, "Failed to increase RLIMIT_MEMLOCK limit!\n");
 		exit(1);
 	}
 }
@@ -134,10 +137,10 @@ static void sig_parentHandler(int sig)
 	if (exiting) return;
 
 	if (SIGINT == sig)
-		fprintf(stdout, "\nReceived signal SIGINT\n");
+		log_info(stdout, "\nReceived signal SIGINT\n");
 
 	if (SIGTERM == sig)
-		fprintf(stdout, "\nReceived signal SIGTERM\n");
+		log_info(stdout, "\nReceived signal SIGTERM\n");
 
 	exiting = true;
 }
@@ -145,7 +148,7 @@ static void sig_parentHandler(int sig)
 static void sig_childHandler(int sig)
 {
 	if (SIGCONT == sig)
-		fprintf(stdout, "\nReceived signal SIGCONT\n");
+		log_verb(stdout, "\nReceived signal SIGCONT\n");
 }
 
 
@@ -158,19 +161,19 @@ static int exec_prog_and_wait(const char *path, const char **argv)
 	my_pid = fork();
      	if (my_pid < 0)
 	{
-		fprintf(stderr, "Could not execute fork\n");
+		log_info(stderr, "Could not execute fork\n");
          	exit(1);
 	}
+
+	log_info(stdout, "Launching child process: %s ", path);
+	for (int i=1; argv[i] !=NULL; i++){
+		fprintf(stdout, " %s", argv[i]);
+	};
+	log_verb(stdout, "\nPaused waiting for SIGCONT ..\n");
 
 	/* child process */
      	if (my_pid == 0)
         {
-		fprintf(stdout, "Launching child process: %s ", path);
-		for (int i=1; argv[i] !=NULL; i++){
-			fprintf(stdout, " %s", argv[i]);
-		};
-//		fprintf(stdout, "\nPaused waiting for SIGCONT ..\n");
-
 		signal(SIGCONT, sig_childHandler);
 		pause();
 		if (-1 == execve(path, (char **)argv , NULL)) {
@@ -208,8 +211,8 @@ int main(int argc, char **argv)
 
 	int child_pid = exec_prog_and_wait(my_exec_path, my_exec_argv);
 
-//	fprintf(stdout, "Parent pid: %d\n", getpid());
-//	fprintf(stdout, "Child pid: %d\n", child_pid);
+	log_verb(stdout, "Parent pid: %d\n", getpid());
+	log_verb(stdout, "Child pid: %d\n", child_pid);
 
 	/* Load and verify BPF application */
 	skel = lsmtrace_bpf__open();
@@ -228,24 +231,24 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	fprintf(stdout, "Attaching hooks, don`t rush..\n");
+	log_info(stdout, "\nAttaching hooks, don`t rush..\n");
 
 	/* Attach tracepoints */
 	err = lsmtrace_bpf__attach(skel);
 	if (err) {
-		fprintf(stderr, "Failed to attach BPF skeleton\n");
+		log_info(stderr, "Failed to attach BPF skeleton\n");
 		goto cleanup;
 	}
 
 	/* Send child cont signal */
-	fprintf(stdout, "Attached, starting execution\n");
+	log_info(stdout, "Attached, starting execution\n");
 	kill(child_pid, SIGCONT);	
 
 	/* Set up ring buffer polling */
 	ringbuffer = ring_buffer__new(bpf_map__fd(skel->maps.ringbuf), handle_event, NULL, NULL);
 	if (!ringbuffer) {
 		err = -1;
-		fprintf(stderr, "Failed to create ring buffer\n");
+		log_info(stderr, "Failed to create ring buffer\n");
 		goto cleanup;
 	}
 
@@ -258,7 +261,7 @@ int main(int argc, char **argv)
 			break;
 		}
 		if (err < 0) {
-			printf("Error polling perf buffer: %d\n", err);
+			log_info(stderr, "Error polling perf buffer: %d\n", err);
 			break;
 		}
 	}

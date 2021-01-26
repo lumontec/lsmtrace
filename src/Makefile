@@ -71,8 +71,13 @@ $(OUTPUT)/%.skel.h: $(OUTPUT)/%.bpf.o | $(OUTPUT)
 # Build user-space code
 $(patsubst %,$(OUTPUT)/%.o,$(APPS)): %.o: %.skel.h
 
+# Build logger obj
+$(OUTPUT)/logger.o: logger.c logger.h | $(OUTPUT)
+	$(call msg,CC,$@)
+	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
+
 # Build statedump obj
-$(OUTPUT)/statedump.o: statedump.c statedump.h | $(OUTPUT)
+$(OUTPUT)/statedump.o: $(OUTPUT)/logger.o statedump.c statedump.h | $(OUTPUT)
 	$(call msg,CC,$@)
 	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
 #	$(Q)$(CC) $(CFLAGS) -c $(filter %.c,$^) -o $@
@@ -83,7 +88,7 @@ $(OUTPUT)/lsmtrace.o: lsmtrace.c | $(OUTPUT)
 	$(Q)$(CC) $(CFLAGS) $(INCLUDES) -c $(filter %.c,$^) -o $@
 
 # Build application binary
-$(APPS): %: $(OUTPUT)/statedump.o $(OUTPUT)/lsmtrace.o $(LIBBPF_OBJ) | $(OUTPUT)
+$(APPS): %: $(OUTPUT)/logger.o $(OUTPUT)/statedump.o $(OUTPUT)/lsmtrace.o $(LIBBPF_OBJ) | $(OUTPUT)
 	$(call msg,BINARY,$@)
 	$(Q)$(CC) $(CFLAGS) $^ -lelf -lz -o $@
 
