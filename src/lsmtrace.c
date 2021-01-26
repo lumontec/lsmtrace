@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
-//
-
 
 #include <argp.h>
 #include <signal.h>
@@ -9,7 +6,7 @@
 #include <unistd.h>
 #include <sys/resource.h>
 #include <bpf/libbpf.h>
-//#include "lsmtrace.h"
+#include "string.h"
 #include <linux/btf.h>
 #include "lsmtrace.skel.h"
 #include "statedump.h"
@@ -17,50 +14,66 @@
 
 /* Argp info */
 const char *argp_program_version = "lsmtrace version 0.1";
-const char *argp_program_bug_address = "<https://github.com/lumontec/lsmtrace.git/issues>";
+const char *argp_program_bug_address = "<https://github.com/lumontec/lsmtrace/issues>";
 const char argp_program_doc[] = 
 "\nLinux Security Modules tracer\n"
 "\n"
 "Trace lsm hook calls triggered by process\n"
 "\n"
 "Options:\n";
-const char argp_program_args[] = "my_executable";
+const char argp_program_args[] = "my_exec -a 'my_exec_arg1' ..";
 
 /* Argp options */
 static const struct argp_option opts[] = {
 	{ "verbose", 'v', NULL, 0, "Verbose debug output" },
 	{ "filter", 'f', "<cathegory>", 0, "Filter lsm hook cathegory, available {all|file|inode}" },
+	{ "arg", 'a', "<executable_arg>", 0, "Executable command argument" },
 	{},
 };
 
 /* Argp arguments */
-static struct env {
+static struct argp_args {
 	bool verbose;
-	long min_duration_ms;
 	const char *cathegory;
-} env;
+} argp_args;
 
-const char    *my_argv[64] = {"/bin/ls" , "/home", NULL};
+
+static int argcnt = 1;
+const char    *my_exec_argv[63] = {}; // {"/bin/ls" ,"-lath", "/home", NULL};
+const char    *my_exec_path = ""; // {"/bin/ls" ,"-lath", "/home", NULL};
 
 /* Argp parse */
 static error_t parse_arg(int key, char *arg, struct argp_state *state)
 {
 	switch (key) {
 	case 'v':
-		env.verbose = true;
+		argp_args.verbose = true;
 		break;
 	case 'f':
-//		errno = 0;
-//		env.min_duration_ms = strtol(arg, NULL, 10);
-//		if (errno || env.min_duration_ms <= 0) {
-//			fprintf(stderr, "Invalid duration: %s\n", arg);
-//			argp_usage(state);
-//		}
+		if (strcmp(arg, "file") == 0) 
+		{
+			argp_args.cathegory = "file";
+			break;
+		} 
+		if (strcmp(arg, "inode") == 0) 
+		{
+			argp_args.cathegory = "inode";
+			break;
+		} 
+		fprintf(stderr, "no option found: %s\n", arg);
+		break;
+	case 'a':
+		fprintf(stdout, "arg option found: %s\n", arg);
+		my_exec_argv[argcnt] = arg; 
+		my_exec_argv[argcnt+1] = NULL; // Set next to NULL
+		argcnt += 1;
 		break;
 	case ARGP_KEY_ARG:
-		argp_usage(state);
+		fprintf(stdout, "exec option found: %s\n", arg);
+		my_exec_path = arg; // Set next to NULL
 		break;
    	case ARGP_KEY_NO_ARGS:
+		fprintf(stderr, "No executable name supplied");
       		argp_usage (state);
 		break;
 	default:
@@ -78,12 +91,11 @@ static const struct argp argp = {
 };
 
 
-
 /* Libbpf callback handlers */
 
 static int libbpf_print_fn(enum libbpf_print_level level, const char *format, va_list args)
 {
-	if (level == LIBBPF_DEBUG && !env.verbose)
+	if (level == LIBBPF_DEBUG && !argp_args.verbose)
 		return 0;
 	return vfprintf(stderr, format, args);
 }
@@ -106,7 +118,6 @@ static int handle_event(void *ctx, void *data, size_t len)
 	dumpEvent(data, len);
 	return 0;
 }
-
 
 
 /* Signal handlers */
@@ -135,9 +146,10 @@ static void sig_childHandler(int sig)
 
 
 /* forks waiting for SIGCONT and returns pid */
-static int exec_prog_and_wait(const char **argv)
+static int exec_prog_and_wait(const char *path, const char **argv)
 {
 	int my_pid;
+	argv[0] = path;
 
 	my_pid = fork();
      	if (my_pid < 0)
@@ -152,8 +164,8 @@ static int exec_prog_and_wait(const char **argv)
 		fprintf(stdout, "Forked child process, paused waiting for SIGCONT\n");
 		signal(SIGCONT, sig_childHandler);
 		pause();
-		fprintf(stdout, "Forked child process, executing\n");
-		if (-1 == execve(argv[0], (char **)argv , NULL)) {
+		fprintf(stdout, "Forked child process, executing: %s\n", path);
+		if (-1 == execve(path, (char **)argv , NULL)) {
 			perror("child process execve failed [%m]");
 			exit(1);
 		}
@@ -188,7 +200,7 @@ int main(int argc, char **argv)
 
 	fprintf(stdout, "Launching process fork\n");
 
-	int child_pid = exec_prog_and_wait(my_argv);
+	int child_pid = exec_prog_and_wait(my_exec_path, my_exec_argv);
 
 	fprintf(stdout, "Parent pid: %d\n", getpid());
 	fprintf(stdout, "Child pid: %d\n", child_pid);
@@ -223,7 +235,6 @@ int main(int argc, char **argv)
 	fprintf(stdout, "Attached, starting execution\n");
 	kill(child_pid, SIGCONT);	
 
-
 	/* Set up ring buffer polling */
 	ringbuffer = ring_buffer__new(bpf_map__fd(skel->maps.ringbuf), handle_event, NULL, NULL);
 	if (!ringbuffer) {
@@ -245,7 +256,6 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-
 
 cleanup:
 	/* Clean up */
