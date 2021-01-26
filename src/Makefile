@@ -77,7 +77,7 @@ $(OUTPUT)/logger.o: logger.c logger.h | $(OUTPUT)
 	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
 
 # Build statedump obj
-$(OUTPUT)/statedump.o: $(OUTPUT)/logger.o statedump.c statedump.h | $(OUTPUT)
+$(OUTPUT)/statedump.o: statedump.c statedump.h | $(OUTPUT)
 	$(call msg,CC,$@)
 	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
 #	$(Q)$(CC) $(CFLAGS) -c $(filter %.c,$^) -o $@

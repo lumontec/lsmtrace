@@ -75,29 +75,4 @@ typedef struct qstr_struct_Event {
 } qstr_struct_Event;
 
 
-
-
-
-
-
-
-
-//struct process_info {
-//	int ppid;
-//	int pid;
-//	int tgid;
-////	char name[PATH_MAX];
-//};
-
-
-//struct event {
-//	int pid;
-//	int ppid;
-//	unsigned exit_code;
-//	unsigned long long duration_ns;
-//	char comm[TASK_COMM_LEN];
-//	char filename[MAX_FILENAME_LEN];
-////	bool exit_event;
-//};
-
 #endif /* __EVENTS_H */

@@ -1,5 +1,7 @@
 #include "statedump.h"
 #include "events.h"
+#include "logger.h"
+#include <stdio.h>
 
 
 /* Dump file struct event */
@@ -8,26 +10,24 @@ int dumpFileStruct(struct file fl, size_t len);
 
 int printFunCallEvt(const struct Event *evt) {
 	const func_call_Event* tevt = (func_call_Event*) evt;
-	printf("\n-> %s: ", evt->label);
-	printf("-> %s", tevt->name);
-	printf("( %s", tevt->args);
-	printf(" )\n");
+	log_info("\n-> %s: ", evt->label);
+	log_info("-> %s", tevt->name);
+	log_info("( %s", tevt->args);
+	log_info(" )\n");
 	return 0;
 }
 
 int printUintMemberEvt(const struct Event *evt) {
 	const uint_member_Event* tevt = (uint_member_Event*) evt;
-//	printf("   %s: ", evt->label);
-	printf("     %s = ", tevt->msg);
-	printf("%u\n", tevt->member);
+	log_info("     %s = ", tevt->msg);
+	log_info("%u\n", tevt->member);
 	return 0;
 }
 
 int printStrMemberEvt(const struct Event *evt) {
 	const str_member_Event* tevt = (str_member_Event*) evt;
-//	printf("   %s: ", evt->label);
-	printf("     %s = ", tevt->msg);
-	printf("%s\n", tevt->member);
+	log_info("     %s = ", tevt->msg);
+	log_info("%s\n", tevt->member);
 	return 0;
 }
 
@@ -52,24 +52,24 @@ int dumpEvent(void* data, size_t len) {
 		}
 		case STRUCT_FILE: {
 			const file_struct_Event* tevt = (file_struct_Event*) evt;
-			printf(" ->Message: %s\n", tevt->msg);
-			__builtin_dump_struct(tevt, &printf);
+			log_info(" ->Message: %s\n", tevt->msg);
+			__builtin_dump_struct(tevt, &log_info);
 			break;
 		}
 		case STRUCT_DENTRY: {
 			const dentry_struct_Event* tevt = (dentry_struct_Event*) evt;
-			printf(" -> Message: %s\n", tevt->msg);
-			__builtin_dump_struct(tevt, &printf);
+			log_info(" -> Message: %s\n", tevt->msg);
+			__builtin_dump_struct(tevt, &log_info);
 			break;
 		}
 		case STRUCT_QSTR: {
 			const qstr_struct_Event* tevt = (qstr_struct_Event*) evt;
-			printf(" -> Message: %s\n", tevt->msg);
-			__builtin_dump_struct(tevt, &printf);
+			log_info(" -> Message: %s\n", tevt->msg);
+			__builtin_dump_struct(tevt, &log_info);
 			break;
 		}
 		default: {
-			printf(" Error: Event not found !\n");
+			log_err("Event not found !\n");
 			break;
 		}
 	}
@@ -80,9 +80,9 @@ int dumpEvent(void* data, size_t len) {
 
 
 
-/* Test print ciao */
+/* Test print test */
 int printTest() {
-	printf("ciao\n");
+	log_info("test\n");
 	return 0;
 }
 

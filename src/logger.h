@@ -4,8 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-int log_info(FILE *f, const char *fmt, ...);
-int log_verb(FILE *f, const char *fmt, ...);
+int log_info(const char *fmt, ...);
+int log_verb(const char *fmt, ...);
+int log_err(const char *fmt, ...);
 
 void setLoggerVerbose(bool);
 
