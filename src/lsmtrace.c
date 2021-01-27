@@ -22,6 +22,7 @@ const char argp_program_doc[] =
 "\nLinux Security Modules tracer\n"
 "\n"
 "Trace lsm hook calls triggered by process\n"
+"BPF_LSM config option must be enabled on this kernel\n"
 "\n"
 "Options:\n";
 const char argp_program_args[] = "my_exec -a 'my_exec_arg1' ..";
@@ -30,7 +31,6 @@ const char argp_program_args[] = "my_exec -a 'my_exec_arg1' ..";
 static const struct argp_option opts[] = {
 	{ "verbose", 'v', NULL, 0, "Verbose debug output" },
 	{ "filter", 'f', "<cathegory>", 0, "Filter lsm hook cathegory, available {all|file|inode}" },
-	{ "output", 'o', "<output>", 0, "Redirect output to file" },
 	{ "arg", 'a', "<executable_arg>", 0, "Executable command argument" },
 	{},
 };
@@ -74,10 +74,6 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 		} 
       		argp_usage (state);
 		//log_err("no option found: %s\n", arg);
-		break;
-	case 'o':
-		log_info("saving output on file: %s\n", arg);
-		output_path = arg;
 		break;
 	case 'a':
 		my_exec_argv[argcnt] = arg; 
@@ -241,7 +237,7 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	log_verb("\nAttaching hooks, don`t rush..\n");
+	log_info("\nAttaching hooks, don`t rush..\n");
 
 	/* Attach tracepoints */
 	err = lsmtrace_bpf__attach(skel);
