@@ -6,8 +6,8 @@
 #include "vmlinux.h"
 
 #define MAX_LABEL_SIZE 100
-#define MAX_MSG_SIZE 50
-#define MAX_STR_SIZE 50
+#define MAX_MSG_SIZE 200
+#define MAX_STR_SIZE 200 
 
 enum Event_type {
 
