@@ -11,6 +11,8 @@
 #include "lsmtrace.skel.h"
 #include "statedump.h"
 #include "logger.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 /* Argp info */
@@ -36,7 +38,7 @@ static const struct argp_option opts[] = {
 /* Argp arguments */
 static struct argp_args {
 	bool verbose;
-	const char *cathegory;
+	int cathegory;
 } argp_args;
 
 
@@ -57,15 +59,21 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 	case 'f':
 		if (strcmp(arg, "file") == 0) 
 		{
-			argp_args.cathegory = "file";
+			argp_args.cathegory = FILE_CATH;
 			break;
 		} 
 		if (strcmp(arg, "inode") == 0) 
 		{
-			argp_args.cathegory = "inode";
+			argp_args.cathegory = INODE_CATH;
 			break;
 		} 
-		log_err("no option found: %s\n", arg);
+		if (strcmp(arg, "all") == 0) 
+		{
+			argp_args.cathegory = ALL;
+			break;
+		} 
+      		argp_usage (state);
+		//log_err("no option found: %s\n", arg);
 		break;
 	case 'o':
 		log_info("saving output on file: %s\n", arg);
@@ -165,9 +173,9 @@ static int exec_prog_and_wait(const char *path, const char **argv)
          	exit(1);
 	}
 
-	log_info("Launching child process: %s ", path);
+	log_verb("Launching child process: %s ", path);
 	for (int i=1; argv[i] !=NULL; i++){
-		fprintf(stdout, " %s", argv[i]);
+		log_verb(" %s", argv[i]);
 	};
 	log_verb("\nPaused waiting for SIGCONT ..\n");
 
@@ -182,6 +190,7 @@ static int exec_prog_and_wait(const char *path, const char **argv)
 		}
 		exit(0);
 	}
+
 
 	return my_pid;
 }
@@ -223,7 +232,7 @@ int main(int argc, char **argv)
 
 	/* Configure bpf probe with init values */
 	skel->bss->my_pid = child_pid;
-	skel->rodata->cathegory = INODE_CATH;
+	skel->rodata->cathegory = argp_args.cathegory;
 
 	/* Load & verify BPF programs */
 	err = lsmtrace_bpf__load(skel);
@@ -253,9 +262,20 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
+
+	int childStatus;
+	pid_t pidret;
+
 	while (!exiting) {
 
+		pidret = waitpid(-1, &childStatus, WNOHANG);
+
+		if (pidret > 0) {
+			break;
+		}
+
 		err = ring_buffer__poll(ringbuffer, 100 /* timeout, ms */);
+
 		/* Ctrl-C will cause -EINTR */
 		if (err == -EINTR) {
 			err = 0;
