@@ -221,8 +221,9 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	/* pass child pid to bpf side */
+	/* Configure bpf probe with init values */
 	skel->bss->my_pid = child_pid;
+	skel->rodata->cathegory = INODE_CATH;
 
 	/* Load & verify BPF programs */
 	err = lsmtrace_bpf__load(skel);
@@ -231,7 +232,7 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	log_info("\nAttaching hooks, don`t rush..\n");
+	log_verb("\nAttaching hooks, don`t rush..\n");
 
 	/* Attach tracepoints */
 	err = lsmtrace_bpf__attach(skel);
@@ -241,7 +242,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Send child cont signal */
-	log_info("Attached, starting execution\n");
+	log_verb("Attached, starting execution\n");
 	kill(child_pid, SIGCONT);	
 
 	/* Set up ring buffer polling */

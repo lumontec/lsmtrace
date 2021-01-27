@@ -8,6 +8,10 @@
 #include <bpf/bpf_core_read.h>
 #include "events.h"
 
+#define FILTER_CATHEGORY(CATH) 			\
+if (CATH != cathegory && cathegory != ALL)	\
+	return 0;				
+
 #define FILTER_OWN_PID_INT() 			\
 int pid = bpf_get_current_pid_tgid() >> 32;	\
 if (pid != my_pid)				\
@@ -19,13 +23,22 @@ if (pid != my_pid)				\
 	return;					
 
 
+/* Maps declaration */
 struct {
 	__uint(type, BPF_MAP_TYPE_RINGBUF);
 	__uint(max_entries, 1 << 24);
 } ringbuf SEC(".maps");
 
+
+/* Globals */
+
 long ringbuffer_flags = 0;
 int my_pid = 0;
+const volatile enum {
+	ALL = 0,
+	FILE_CATH = 1,
+	INODE_CATH = 2
+} cathegory;
 
 
 char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
