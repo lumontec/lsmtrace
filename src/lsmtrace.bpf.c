@@ -19,6 +19,7 @@
 #include <bpf/bpf_tracing.h>
 #include <bpf/bpf_core_read.h>
 #include "bpf_dump_helpers.h"
+#include "bpf_dump_structs.h"
 #include "events.h"
 
 
@@ -306,13 +307,13 @@ int BPF_PROG(move_mount, const struct path *from_path,
 	return 0;
 }
 
-//SEC("lsm/dentry_init_security")
-//int BPF_PROG(dentry_init_security, struct dentry *dentry,
-//	 int mode, const struct qstr *name, void **ctx, u32 *ctxlen)
-//{
-//	bpf_printk("lsm_hook: fs: dentry_init_security\n");
-//	return 0;
-//}
+SEC("lsm/dentry_init_security")
+int BPF_PROG(dentry_init_security, struct dentry *dentry,
+	 int mode, const struct qstr *name, void **lsm_ctx, u32 *ctxlen)
+{
+	bpf_printk("lsm_hook: fs: dentry_init_security\n");
+	return 0;
+}
 
 SEC("lsm/dentry_create_files_as")
 int BPF_PROG(dentry_create_files_as, struct dentry *dentry, int mode,
@@ -820,6 +821,7 @@ int BPF_PROG(file_permission, struct file *file, int mask)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_permission, struct file *file, int mask)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: file_permission\n");
 	return 0;
 }
@@ -831,6 +833,7 @@ int BPF_PROG(file_alloc_security, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_alloc_security, struct file *file)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: file_alloc_security\n");
 	return 0;
 }
@@ -842,6 +845,7 @@ void BPF_PROG(file_free_security, struct file *file)
 	FILTER_OWN_PID_VOID()
 	DUMP_FUNC(file_free_security, struct file *file)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: file_free_security\n");
 }
 
@@ -854,6 +858,7 @@ int BPF_PROG(file_ioctl, struct file *file, unsigned int cmd,
 	DUMP_FUNC(file_ioctl, struct file *file, unsigned int cmd,
 	 unsigned long arg)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: file_ioctl\n");
 	return 0;
 }
@@ -878,6 +883,7 @@ int BPF_PROG(mmap_file, struct file *file, unsigned long reqprot,
 	DUMP_FUNC(mmap_file, struct file *file, unsigned long reqprot,
 	 unsigned long prot, unsigned long flags)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: mmap_file\n");
 	return 0;
 }
@@ -902,6 +908,7 @@ int BPF_PROG(file_lock, struct file *file, unsigned int cmd)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_lock, struct file *file, unsigned int cmd)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: file_mprotect\n");
 	return 0;
 }
@@ -915,6 +922,7 @@ int BPF_PROG(file_fcntl, struct file *file, unsigned int cmd,
 	DUMP_FUNC(file_fcntl, struct file *file, unsigned int cmd,
 	 unsigned long arg)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: file_fcntl\n");
 	return 0;
 }
@@ -926,6 +934,7 @@ int BPF_PROG(file_set_fowner, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_set_fowner, struct file *file)
 
+	DUMP_FILE_STRUCT(file)
 //	bpf_printk("lsm_hook: file: file_set_fowner\n");
 	return 0;
 }
@@ -950,6 +959,8 @@ int BPF_PROG(file_receive, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_receive, struct file *file)
 
+	DUMP_FILE_STRUCT(file)
+
 //	bpf_printk("lsm_hook: file: file_receive\n");
 	return 0;
 }
@@ -963,11 +974,11 @@ int BPF_PROG(file_open, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_open, struct file *file)
 	
-	DUMP_MEMBER_UINT(file,f_mode)
-	DUMP_MEMBER_UINT(file,f_path.dentry,d_flags)
-	DUMP_MEMBER_STR (file,f_path.dentry,d_name.name)
+	DUMP_FILE_STRUCT(file)
 
-//	bpf_printk("lsm_hook: file: file_open\n");
+//	DUMP_MEMBER_UINT(file,f_mode)
+//	DUMP_MEMBER_UINT(file,f_path.dentry,d_flags)
+//	DUMP_MEMBER_STR (file,f_path.dentry,d_name.name)
 
 //	DUMP_STRUCT(file, 	STRUCT_FILE, 	file 				)
 //	DUMP_STRUCT(qstr, 	STRUCT_QSTR, 	&file->f_path.dentry->d_name 	)
