@@ -14,7 +14,9 @@ enum Event_type {
 	FUNCTION_CALL = 0,
 
 	MEMBER_UINT = 10,
-	MEMBER_STR = 11,
+	MEMBER_LINT = 12,
+	MEMBER_LLINT = 13,
+	MEMBER_STR = 15,
 
 	STRUCT_FILE = 100,
 	STRUCT_DENTRY = 101,
@@ -46,6 +48,17 @@ typedef struct uint_member_Event {
 	char msg[MAX_MSG_SIZE];
 } uint_member_Event;
 
+typedef struct lint_member_Event {
+	Event super;
+	long int member;	
+	char msg[MAX_MSG_SIZE];
+} lint_member_Event;
+
+typedef struct llint_member_Event {
+	Event super;
+	long long int member;	
+	char msg[MAX_MSG_SIZE];
+} llint_member_Event;
 
 typedef struct str_member_Event {
 	Event super;

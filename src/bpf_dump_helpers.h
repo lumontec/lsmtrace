@@ -65,6 +65,18 @@ char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 	dump_uint_member(dump_member_name, mptr);						\
 }
 
+#define DUMP_MEMBER_LINT(...) {									\
+	const char dump_member_name[] = #__VA_ARGS__;						\
+	long int mptr = BPF_CORE_READ(__VA_ARGS__);						\
+	dump_lint_member(dump_member_name, mptr);						\
+}
+
+#define DUMP_MEMBER_LLINT(...) {								\
+	const char dump_member_name[] = #__VA_ARGS__;						\
+	long long int mptr = BPF_CORE_READ(__VA_ARGS__);					\
+	dump_llint_member(dump_member_name, mptr);						\
+}
+
 #define DUMP_MEMBER_STR(...) {		 							\
 	const char dump_member_name[] = #__VA_ARGS__;						\
 	const unsigned char *mptr = BPF_CORE_READ(__VA_ARGS__);					\
@@ -76,7 +88,7 @@ char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 static int dump_func(const char *fname, const char *fargs) {
 
 	struct func_call_Event *evt; 								
-	char func_call_label[] = "FUNCTION_CALL";
+	char func_call_label[] = "HOOK_CALL";
 
 	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
 
@@ -93,7 +105,6 @@ static int dump_func(const char *fname, const char *fargs) {
 
 	return 0;
 }
-
 
 static int dump_uint_member(const char *mname, unsigned int mptr) {
 
@@ -114,6 +125,49 @@ static int dump_uint_member(const char *mname, unsigned int mptr) {
 
 	return 0;
 }
+
+static long dump_lint_member(const char *mname, unsigned int mptr) {
+
+	struct lint_member_Event *evt; 								
+	char lint_member_label[] = "MEMBER_DUMP";
+
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
+
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = MEMBER_LINT;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), lint_member_label);	
+	evt->member = mptr;	
+	bpf_probe_read_str(evt->msg, sizeof(evt->msg), mname);				
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
+}
+
+static long dump_llint_member(const char *mname, unsigned int mptr) {
+
+	struct llint_member_Event *evt; 								
+	char llint_member_label[] = "MEMBER_DUMP";
+
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
+
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = MEMBER_LLINT;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), llint_member_label);	
+	evt->member = mptr;	
+	bpf_probe_read_str(evt->msg, sizeof(evt->msg), mname);				
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
+}
+
+
+
 
 
 static int dump_str_member(const char *mname, const unsigned char *mptr) {
