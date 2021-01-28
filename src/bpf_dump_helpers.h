@@ -9,11 +9,11 @@
 #include "events.h"
 
 #define FILTER_CATHEGORY_INT(CATH)		\
-if (CATH != cathegory && cathegory != ALL)	\
+if (CATH != cathegory && cathegory != ALL_CATH)	\
 	return 0;				
 
 #define FILTER_CATHEGORY_VOID(CATH) 		\
-if (CATH != cathegory && cathegory != ALL)	\
+if (CATH != cathegory && cathegory != ALL_CATH)	\
 	return ;				
 
 
@@ -40,8 +40,9 @@ struct {
 long ringbuffer_flags = 0;
 int my_pid = 0;
 const volatile enum {
-	ALL = 0,
-	PROG_EXEC = 1,
+	ALL_CATH = 0,
+	PROG_EXEC_CATH = 1,
+	MOUNT_FS_CATH = 2,
 	FILE_CATH = 10,
 	INODE_CATH = 20
 } cathegory;
@@ -53,8 +54,8 @@ char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 /* Dirty macro hacks to work around libbpf lack of string locals */
 
 #define DUMP_FUNC(FNAME, ...) {									\
-	char func_call_name[] = #FNAME;								\
-	char func_call_args[] = #__VA_ARGS__;							\
+	const char func_call_name[] = #FNAME;						\
+	const char func_call_args[] = #__VA_ARGS__;					\
 	dump_func(func_call_name, func_call_args);						\
 }	
 

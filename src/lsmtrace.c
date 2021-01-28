@@ -69,7 +69,7 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 		} 
 		if (strcmp(arg, "all") == 0) 
 		{
-			argp_args.cathegory = ALL;
+			argp_args.cathegory = ALL_CATH;
 			break;
 		} 
       		argp_usage (state);
@@ -106,7 +106,7 @@ static const struct argp argp = {
 
 static int libbpf_print_fn(enum libbpf_print_level level, const char *format, va_list args)
 {
-	if (level == LIBBPF_DEBUG && !argp_args.verbose)
+	if ( ( level == LIBBPF_DEBUG || level == LIBBPF_INFO ) && !argp_args.verbose )
 		return 0;
 	return vfprintf(stderr, format, args);
 }

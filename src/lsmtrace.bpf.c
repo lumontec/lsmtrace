@@ -45,33 +45,33 @@
 SEC("lsm/bprm_creds_for_exec")
 int BPF_PROG(bprm_creds_for_exec, struct linux_binprm *bprm)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(PROG_EXEC_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(bprm_creds_for_exec, struct linux_binprm *bprm)
 
-	bpf_printk("lsm_hook: exec: bprm_creds_for_exec\n");
+//	bpf_printk("lsm_hook: exec: bprm_creds_for_exec\n");
 	return 0;
 }
 
 SEC("lsm/bprm_creds_from_file")
 int BPF_PROG(bprm_creds_from_file, struct linux_binprm *bprm, struct file *file)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(PROG_EXEC_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(bprm_creds_from_file, struct linux_binprm *bprm, struct file *file)
 
-	bpf_printk("lsm_hook: exec: bprm_creds_from_file\n");
+//	bpf_printk("lsm_hook: exec: bprm_creds_from_file\n");
 	return 0;
 }
 
 SEC("lsm/bprm_check_security")
 int BPF_PROG(bprm_check_security, struct linux_binprm *bprm)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(PROG_EXEC_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(bprm_check_security, struct linux_binprm *bprm)
 
-	bpf_printk("lsm_hook: exec: bprm_check_security\n");
+//	bpf_printk("lsm_hook: exec: bprm_check_security\n");
 	return 0;
 }
 
@@ -79,21 +79,21 @@ int BPF_PROG(bprm_check_security, struct linux_binprm *bprm)
 SEC("lsm/bprm_committing_creds")
 void BPF_PROG(bprm_committing_creds, struct linux_binprm *bprm)
 {
-	FILTER_CATHEGORY_VOID(PROG_EXEC)
+	FILTER_CATHEGORY_VOID(PROG_EXEC_CATH)
 	FILTER_OWN_PID_VOID()
 	DUMP_FUNC(bprm_committing_creds, struct linux_binprm *bprm)
 
-	bpf_printk("lsm_hook: exec: bprm_committing_creds\n");
+//	bpf_printk("lsm_hook: exec: bprm_committing_creds\n");
 }
 
 SEC("lsm/bprm_committed_creds")
 void BPF_PROG(bprm_committed_creds, struct linux_binprm *bprm)
 {
-	FILTER_CATHEGORY_VOID(PROG_EXEC)
+	FILTER_CATHEGORY_VOID(PROG_EXEC_CATH)
 	FILTER_OWN_PID_VOID()
 	DUMP_FUNC(bprm_committed_creds, struct linux_binprm *bprm)
 
-	bpf_printk("lsm_hook: exec: bprm_committed_creds\n");
+//	bpf_printk("lsm_hook: exec: bprm_committed_creds\n");
 }
 
 
@@ -102,22 +102,22 @@ void BPF_PROG(bprm_committed_creds, struct linux_binprm *bprm)
 SEC("lsm/fs_context_dup")
 int BPF_PROG(fs_context_dup,  struct fs_context *fc, struct fs_context *src_sc)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(MOUNT_FS_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(fs_context_dup,  struct fs_context *fc, struct fs_context *src_sc)
 
-	bpf_printk("lsm_hook: fs_context: fs_context_dup\n");
+//	bpf_printk("lsm_hook: fs_context: fs_context_dup\n");
 	return 0;
 }
 
 SEC("lsm/fs_context_parse_param")
 int BPF_PROG(fs_context_parse_param, struct fs_context *fc, struct fs_parameter *param)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(MOUNT_FS_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(fs_context_parse_param, struct fs_context *fc, struct fs_parameter *param)
 
-	bpf_printk("lsm_hook: fs_context: fs_context_parse_param\n");
+//	bpf_printk("lsm_hook: fs_context: fs_context_parse_param\n");
 	return 0;
 }
 
@@ -127,53 +127,53 @@ int BPF_PROG(fs_context_parse_param, struct fs_context *fc, struct fs_parameter 
 SEC("lsm/sb_alloc_security")
 int BPF_PROG(sb_alloc_security, struct super_block *sb)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_alloc_security, struct super_block *sb)
 
-	bpf_printk("lsm_hook: fs: sb_alloc_security\n");
+//	bpf_printk("lsm_hook: fs: sb_alloc_security\n");
 	return 0;
 }
 
 SEC("lsm/sb_free_security")
 void BPF_PROG(sb_free_security, struct super_block *sb)
 {
-	FILTER_CATHEGORY_VOID(PROG_EXEC)
+	FILTER_CATHEGORY_VOID(FILE_CATH)
 	FILTER_OWN_PID_VOID()
 	DUMP_FUNC(sb_alloc_security, struct super_block *sb)
 
-	bpf_printk("lsm_hook: fs: sb_free_security\n");
+//	bpf_printk("lsm_hook: fs: sb_free_security\n");
 }
 
 SEC("lsm/sb_free_mnt_opts")
 void BPF_PROG(sb_free_mnt_opts, void *mnt_opts)
 {
-	FILTER_CATHEGORY_VOID(PROG_EXEC)
+	FILTER_CATHEGORY_VOID(FILE_CATH)
 	FILTER_OWN_PID_VOID()
 	DUMP_FUNC(sb_free_mnt_opts, void *mnt_opts)
 
-	bpf_printk("lsm_hook: fs: sb_free_mnt_opts\n");
+//	bpf_printk("lsm_hook: fs: sb_free_mnt_opts\n");
 }
 
 SEC("lsm/sb_eat_lsm_opts")
 int BPF_PROG(sb_eat_lsm_opts, char *orig, void **mnt_opts)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_eat_lsm_opts, char *orig, void **mnt_opts)
 
-	bpf_printk("lsm_hook: fs: sb_eat_lsm_opts\n");
+//	bpf_printk("lsm_hook: fs: sb_eat_lsm_opts\n");
 	return 0;
 }
 
 SEC("lsm/sb_statfs")
 int BPF_PROG(sb_statfs, struct dentry *dentry)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_statfs, struct dentry *dentry)
 
-	bpf_printk("lsm_hook: fs: sb_statfs\n");
+//	bpf_printk("lsm_hook: fs: sb_statfs\n");
 	return 0;
 }
 
@@ -181,12 +181,12 @@ SEC("lsm/sb_mount")
 int BPF_PROG(sb_mount, const char *dev_name, const struct path *path,
 	const char *type, unsigned long flags, void *data)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_mount, const char *dev_name, const struct path *path,
 	const char *type, unsigned long flags, void *data)
 
-	bpf_printk("lsm_hook: fs: sb_mount\n");
+//	bpf_printk("lsm_hook: fs: sb_mount\n");
 	return 0;
 }
 
@@ -195,44 +195,44 @@ int BPF_PROG(sb_mount, const char *dev_name, const struct path *path,
 SEC("lsm/sb_remount")
 int BPF_PROG(sb_remount, struct super_block *sb, void *mnt_opts)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_remount, struct super_block *sb, void *mnt_opts)
 
-	bpf_printk("lsm_hook: fs: sb_mount\n");
+//	bpf_printk("lsm_hook: fs: sb_mount\n");
 	return 0;
 }
 
 SEC("lsm/sb_kern_mount")
 int BPF_PROG(sb_kern_mount, struct super_block *sb)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_kern_mount, struct super_block *sb)
 
-	bpf_printk("lsm_hook: fs: sb_kern_mount\n");
+//	bpf_printk("lsm_hook: fs: sb_kern_mount\n");
 	return 0;
 }
 
 SEC("lsm/sb_show_options")
 int BPF_PROG(sb_show_options, struct seq_file *m, struct super_block *sb)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_show_options, struct seq_file *m, struct super_block *sb)
 
-	bpf_printk("lsm_hook: fs: sb_show_options\n");
+//	bpf_printk("lsm_hook: fs: sb_show_options\n");
 	return 0;
 }
 
 SEC("lsm/sb_umount")
 int BPF_PROG(sb_umount, struct vfsmount *mnt, int flags)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_umount, struct vfsmount *mnt, int flags)
 
-	bpf_printk("lsm_hook: fs: sb_umount\n");
+//	bpf_printk("lsm_hook: fs: sb_umount\n");
 	return 0;
 }
 
@@ -240,12 +240,12 @@ SEC("lsm/sb_pivotroot")
 int BPF_PROG(sb_pivotroot, const struct path *old_path,
 	 const struct path *new_path)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_pivotroot, const struct path *old_path,
 	 const struct path *new_path)
 
-	bpf_printk("lsm_hook: fs: sb_pivotroot\n");
+//	bpf_printk("lsm_hook: fs: sb_pivotroot\n");
 	return 0;
 }
 
@@ -253,12 +253,12 @@ SEC("lsm/sb_set_mnt_opts")
 int BPF_PROG(sb_set_mnt_opts, struct super_block *sb, void *mnt_opts,
 	 unsigned long kern_flags, unsigned long *set_kern_flags)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_set_mnt_opts, struct super_block *sb, void *mnt_opts,
 	 unsigned long kern_flags, unsigned long *set_kern_flags)
 
-	bpf_printk("lsm_hook: fs: sb_set_mnt_opts\n");
+//	bpf_printk("lsm_hook: fs: sb_set_mnt_opts\n");
 	return 0;
 }
 
@@ -267,13 +267,13 @@ int BPF_PROG(sb_clone_mnt_opts, const struct super_block *oldsb,
 	 struct super_block *newsb, unsigned long kern_flags,
 	 unsigned long *set_kern_flags)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_clone_mnt_opts, const struct super_block *oldsb,
 	 struct super_block *newsb, unsigned long kern_flags,
 	 unsigned long *set_kern_flags)
 
-	bpf_printk("lsm_hook: fs: sb_clone_mnt_opts\n");
+//	bpf_printk("lsm_hook: fs: sb_clone_mnt_opts\n");
 	return 0;
 }
 
@@ -281,12 +281,12 @@ SEC("lsm/sb_add_mnt_opt")
 int BPF_PROG(sb_add_mnt_opt, const char *option, const char *val,
 	 int len, void **mnt_opts)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(sb_add_mnt_opt, const char *option, const char *val,
 	 int len, void **mnt_opts)
 
-	bpf_printk("lsm_hook: fs: sb_add_mnt_opt\n");
+//	bpf_printk("lsm_hook: fs: sb_add_mnt_opt\n");
 	return 0;
 }
 
@@ -297,12 +297,12 @@ SEC("lsm/move_mount")
 int BPF_PROG(move_mount, const struct path *from_path,
 	 const struct path *to_path)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(move_mount, const struct path *from_path,
 	 const struct path *to_path)
 
-	bpf_printk("lsm_hook: fs: move_mount\n");
+//	bpf_printk("lsm_hook: fs: move_mount\n");
 	return 0;
 }
 
@@ -318,12 +318,12 @@ SEC("lsm/dentry_create_files_as")
 int BPF_PROG(dentry_create_files_as, struct dentry *dentry, int mode,
 	 struct qstr *name, const struct cred *old, struct cred *new)
 {
-	FILTER_CATHEGORY_INT(PROG_EXEC)
+	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(dentry_create_files_as, struct dentry *dentry, int mode,
 	 struct qstr *name, const struct cred *old, struct cred *new)
 
-	bpf_printk("lsm_hook: fs: dentry_create_files_as\n");
+//	bpf_printk("lsm_hook: fs: dentry_create_files_as\n");
 	return 0;
 }
 
@@ -333,18 +333,22 @@ int BPF_PROG(dentry_create_files_as, struct dentry *dentry, int mode,
 SEC("lsm/inode_alloc_security")
 int BPF_PROG(inode_alloc_security, struct inode *inode)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_alloc_security, struct inode *inode)
 
-	bpf_printk("lsm_hook: inode: inode_alloc_security\n");
+//	bpf_printk("lsm_hook: inode: inode_alloc_security\n");
 	return 0;
 }
 
 SEC("lsm/inode_free_security")
 void BPF_PROG(inode_free_security, struct inode *inode)
 {
+	FILTER_CATHEGORY_VOID(INODE_CATH)
 	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(inode_free_security, struct inode *inode)
 
-	bpf_printk("lsm_hook: inode: inode_free_security\n");
+//	bpf_printk("lsm_hook: inode: inode_free_security\n");
 }
 
 SEC("lsm/inode_init_security")
@@ -352,9 +356,13 @@ int BPF_PROG(inode_init_security, struct inode *inode,
 	 struct inode *dir, const struct qstr *qstr, const char **name,
 	 void **value, size_t *len)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_init_security, struct inode *inode,
+	 struct inode *dir, const struct qstr *qstr, const char **name,
+	 void **value, size_t *len)
 
-	bpf_printk("lsm_hook: inode: inode_init_security\n");
+//	bpf_printk("lsm_hook: inode: inode_init_security\n");
 	return 0;
 }
 
@@ -362,9 +370,12 @@ SEC("lsm/inode_create")
 int BPF_PROG(inode_create, struct inode *dir, struct dentry *dentry,
 	 umode_t mode)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_create, struct inode *dir, struct dentry *dentry,
+	 umode_t mode)
 
-	bpf_printk("lsm_hook: inode: inode_create\n");
+//	bpf_printk("lsm_hook: inode: inode_create\n");
 	return 0;
 }
 
@@ -372,9 +383,12 @@ SEC("lsm/inode_link")
 int BPF_PROG(inode_link, struct dentry *old_dentry, struct inode *dir,
 	 struct dentry *new_dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_link, struct dentry *old_dentry, struct inode *dir,
+	 struct dentry *new_dentry)
 
-	bpf_printk("lsm_hook: inode: inode_link\n");
+//	bpf_printk("lsm_hook: inode: inode_link\n");
 	return 0;
 }
 
@@ -382,27 +396,34 @@ SEC("lsm/path_link")
 int BPF_PROG(path_link, struct dentry *old_dentry,
 	 const struct path *new_dir, struct dentry *new_dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_link, struct dentry *old_dentry,
+	 const struct path *new_dir, struct dentry *new_dentry)
 
-	bpf_printk("lsm_hook: inode: path_link\n");
+//	bpf_printk("lsm_hook: inode: path_link\n");
 	return 0;
 }
 
 SEC("lsm/inode_unlink")
 int BPF_PROG(inode_unlink, struct inode *dir, struct dentry *dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_unlink, struct inode *dir, struct dentry *dentry)
 
-	bpf_printk("lsm_hook: inode: inode_unlink\n");
+//	bpf_printk("lsm_hook: inode: inode_unlink\n");
 	return 0;
 }
 
 SEC("lsm/path_unlink")
 int BPF_PROG(path_unlink, const struct path *dir, struct dentry *dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_unlink, const struct path *dir, struct dentry *dentry)
 
-	bpf_printk("lsm_hook: inode: path_unlink\n");
+//	bpf_printk("lsm_hook: inode: path_unlink\n");
 	return 0;
 }
 
@@ -410,9 +431,12 @@ SEC("lsm/inode_symlink")
 int BPF_PROG(inode_symlink, struct inode *dir, struct dentry *dentry,
 	 const char *old_name)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_symlink, struct inode *dir, struct dentry *dentry,
+	 const char *old_name)
 
-	bpf_printk("lsm_hook: inode: inode_symlink\n");
+//	bpf_printk("lsm_hook: inode: inode_symlink\n");
 	return 0;
 }
 
@@ -420,9 +444,12 @@ SEC("lsm/path_symlink")
 int BPF_PROG(path_symlink, const struct path *dir, struct dentry *dentry,
 	 const char *old_name)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_symlink, const struct path *dir, struct dentry *dentry,
+	 const char *old_name)
 
-	bpf_printk("lsm_hook: inode: path_symlink\n");
+//	bpf_printk("lsm_hook: inode: path_symlink\n");
 	return 0;
 }
 
@@ -430,9 +457,12 @@ SEC("lsm/inode_mkdir")
 int BPF_PROG(inode_mkdir, struct inode *dir, struct dentry *dentry,
 	 umode_t mode)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_mkdir, struct inode *dir, struct dentry *dentry,
+	 umode_t mode)
 
-	bpf_printk("lsm_hook: inode: inode_mkdir\n");
+//	bpf_printk("lsm_hook: inode: inode_mkdir\n");
 	return 0;
 }
 
@@ -440,27 +470,34 @@ SEC("lsm/path_mkdir")
 int BPF_PROG(path_mkdir, const struct path *dir, struct dentry *dentry,
 	 umode_t mode)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_mkdir, const struct path *dir, struct dentry *dentry,
+	 umode_t mode)
 
-	bpf_printk("lsm_hook: inode: path_mkdir\n");
+//	bpf_printk("lsm_hook: inode: path_mkdir\n");
 	return 0;
 }
 
 SEC("lsm/inode_rmdir")
 int BPF_PROG(inode_rmdir, struct inode *dir, struct dentry *dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_rmdir, struct inode *dir, struct dentry *dentry)
 
-	bpf_printk("lsm_hook: inode: inode_rmdir\n");
+//	bpf_printk("lsm_hook: inode: inode_rmdir\n");
 	return 0;
 }
 
 SEC("lsm/path_rmdir")
 int BPF_PROG(path_rmdir, const struct path *dir, struct dentry *dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_rmdir, const struct path *dir, struct dentry *dentry)
 
-	bpf_printk("lsm_hook: inode: path_rmdir\n");
+//	bpf_printk("lsm_hook: inode: path_rmdir\n");
 	return 0;
 }
 
@@ -468,9 +505,12 @@ SEC("lsm/inode_mknod")
 int BPF_PROG(inode_mknod, struct inode *dir, struct dentry *dentry,
 	 umode_t mode, dev_t dev)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_mknod, struct inode *dir, struct dentry *dentry,
+	 umode_t mode, dev_t dev)
 
-	bpf_printk("lsm_hook: inode: inode_mknod\n");
+//	bpf_printk("lsm_hook: inode: inode_mknod\n");
 	return 0;
 }
 
@@ -478,9 +518,12 @@ SEC("lsm/inode_rename")
 int BPF_PROG(inode_rename, struct inode *old_dir, struct dentry *old_dentry,
 	 struct inode *new_dir, struct dentry *new_dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_rename, struct inode *old_dir, struct dentry *old_dentry,
+	 struct inode *new_dir, struct dentry *new_dentry)
 
-	bpf_printk("lsm_hook: inode: inode_rename\n");
+//	bpf_printk("lsm_hook: inode: inode_rename\n");
 	return 0;
 }
 
@@ -489,18 +532,24 @@ int BPF_PROG(path_rename, const struct path *old_dir,
 	 struct dentry *old_dentry, const struct path *new_dir,
 	 struct dentry *new_dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_rename, const struct path *old_dir,
+	 struct dentry *old_dentry, const struct path *new_dir,
+	 struct dentry *new_dentry)
 
-	bpf_printk("lsm_hook: inode: path_rename\n");
+//	bpf_printk("lsm_hook: inode: path_rename\n");
 	return 0;
 }
 
 SEC("lsm/path_chmod")
 int BPF_PROG(path_chmod, const struct path *path, umode_t mode)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_chmod, const struct path *path, umode_t mode)
 
-	bpf_printk("lsm_hook: inode: path_chmod\n");
+//	bpf_printk("lsm_hook: inode: path_chmod\n");
 	return 0;
 }
 
@@ -514,9 +563,11 @@ int BPF_PROG(path_chmod, const struct path *path, umode_t mode)
 SEC("lsm/path_chroot")
 int BPF_PROG(path_chroot, const struct path *path)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_chroot, const struct path *path)
 
-	bpf_printk("lsm_hook: inode: path_chroot\n");
+//	bpf_printk("lsm_hook: inode: path_chroot\n");
 	return 0;
 }
 
@@ -524,18 +575,23 @@ SEC("lsm/path_notify")
 int BPF_PROG(path_notify, const struct path *path, u64 mask,
 	 unsigned int obj_type)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(path_notify, const struct path *path, u64 mask,
+	 unsigned int obj_type)
 
-	bpf_printk("lsm_hook: inode: path_notify\n");
+//	bpf_printk("lsm_hook: inode: path_notify\n");
 	return 0;
 }
 
 SEC("lsm/inode_readlink")
 int BPF_PROG(inode_readlink, struct dentry *dentry)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_readlink, struct dentry *dentry)
 
-	bpf_printk("lsm_hook: inode: inode_readlink\n");
+//	bpf_printk("lsm_hook: inode: inode_readlink\n");
 	return 0;
 }
 
@@ -543,18 +599,23 @@ SEC("lsm/inode_follow_link")
 int BPF_PROG(inode_follow_link, struct dentry *dentry, struct inode *inode,
 	 bool rcu)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_follow_link, struct dentry *dentry, struct inode *inode,
+	 bool rcu)
 
-	bpf_printk("lsm_hook: inode: inode_follow_link\n");
+//	bpf_printk("lsm_hook: inode: inode_follow_link\n");
 	return 0;
 }
 
 SEC("lsm/inode_permission")
 int BPF_PROG(inode_permission, struct inode *inode, int mask)
 {
+	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_permission, struct inode *inode, int mask)
 
-	bpf_printk("lsm_hook: inode: inode_permission\n");
+//	bpf_printk("lsm_hook: inode: inode_permission\n");
 	return 0;
 }
 
@@ -563,7 +624,7 @@ int BPF_PROG(inode_setattr, struct dentry *dentry, struct iattr *attr)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_setattr\n");
+//	bpf_printk("lsm_hook: inode: inode_setattr\n");
 	return 0;
 }
 
@@ -572,7 +633,7 @@ int BPF_PROG(path_truncate, const struct path *path)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: path_truncate\n");
+//	bpf_printk("lsm_hook: inode: path_truncate\n");
 	return 0;
 }
 
@@ -581,7 +642,7 @@ int BPF_PROG(inode_getattr, const struct path *path)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_getattr\n");
+//	bpf_printk("lsm_hook: inode: inode_getattr\n");
 	return 0;
 }
 
@@ -591,7 +652,7 @@ int BPF_PROG(inode_setxattr, struct dentry *dentry, const char *name,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_setxattr\n");
+//	bpf_printk("lsm_hook: inode: inode_setxattr\n");
 	return 0;
 }
 
@@ -601,7 +662,7 @@ int BPF_PROG(inode_post_setxattr, struct dentry *dentry,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_post_setxattr\n");
+//	bpf_printk("lsm_hook: inode: inode_post_setxattr\n");
 	return 0;
 }
 
@@ -610,7 +671,7 @@ int BPF_PROG(inode_getxattr, struct dentry *dentry, const char *name)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_getxattr\n");
+//	bpf_printk("lsm_hook: inode: inode_getxattr\n");
 	return 0;
 }
 
@@ -619,7 +680,7 @@ int BPF_PROG(inode_listxattr, struct dentry *dentry)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_listxattr\n");
+//	bpf_printk("lsm_hook: inode: inode_listxattr\n");
 	return 0;
 }
 
@@ -628,7 +689,7 @@ int BPF_PROG(inode_removexattr, struct dentry *dentry, const char *name)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_removexattr\n");
+//	bpf_printk("lsm_hook: inode: inode_removexattr\n");
 	return 0;
 }
 
@@ -638,7 +699,7 @@ int BPF_PROG(inode_getsecurity, struct inode *inode,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_getsecurity\n");
+//	bpf_printk("lsm_hook: inode: inode_getsecurity\n");
 	return 0;
 }
 
@@ -648,7 +709,7 @@ int BPF_PROG(inode_setsecurity, struct inode *inode,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_setsecurity\n");
+//	bpf_printk("lsm_hook: inode: inode_setsecurity\n");
 	return 0;
 }
 
@@ -659,7 +720,7 @@ int BPF_PROG(inode_listsecurity, struct inode *inode, char *buffer,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_listsecurity\n");
+//	bpf_printk("lsm_hook: inode: inode_listsecurity\n");
 	return 0;
 }
 
@@ -668,7 +729,7 @@ int BPF_PROG(inode_need_killpriv, struct dentry *dentry)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_need_killpriv\n");
+//	bpf_printk("lsm_hook: inode: inode_need_killpriv\n");
 	return 0;
 }
 
@@ -677,7 +738,7 @@ int BPF_PROG(inode_killpriv, struct dentry *dentry)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_killpriv\n");
+//	bpf_printk("lsm_hook: inode: inode_killpriv\n");
 	return 0;
 }
 
@@ -686,7 +747,7 @@ void BPF_PROG(inode_getsecid, struct inode *inode, u32 *secid)
 {
 	FILTER_OWN_PID_VOID()
 
-	bpf_printk("lsm_hook: inode: inode_getsecid\n");
+//	bpf_printk("lsm_hook: inode: inode_getsecid\n");
 }
 
 SEC("lsm/inode_copy_up")
@@ -694,7 +755,7 @@ int BPF_PROG(inode_copy_up, struct dentry *src, struct cred **new)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_copy_up\n");
+//	bpf_printk("lsm_hook: inode: inode_copy_up\n");
 	return 0;
 }
 
@@ -703,7 +764,7 @@ int BPF_PROG(inode_copy_up_xattr, const char *name)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: inode_copy_up_xattr\n");
+//	bpf_printk("lsm_hook: inode: inode_copy_up_xattr\n");
 	return 0;
 }
 
@@ -713,7 +774,7 @@ int BPF_PROG(d_instantiate, struct dentry *dentry,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: d_instantiate\n");
+//	bpf_printk("lsm_hook: inode: d_instantiate\n");
 	return 0;
 }
 
@@ -723,7 +784,7 @@ int BPF_PROG(getprocattr, struct task_struct *p, char *name,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: getprocattr\n");
+//	bpf_printk("lsm_hook: inode: getprocattr\n");
 	return 0;
 }
 
@@ -732,7 +793,7 @@ int BPF_PROG(setprocattr, const char *name, void *value, size_t size)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: inode: setprocattr\n");
+//	bpf_printk("lsm_hook: inode: setprocattr\n");
 	return 0;
 }
 
@@ -745,7 +806,7 @@ int BPF_PROG(kernfs_init_security, struct kernfs_node *kn_dir,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: kernfs_node: kernfs_init_security\n");
+//	bpf_printk("lsm_hook: kernfs_node: kernfs_init_security\n");
 	return 0;
 }
 
@@ -759,7 +820,7 @@ int BPF_PROG(file_permission, struct file *file, int mask)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_permission, struct file *file, int mask)
 
-	bpf_printk("lsm_hook: file: file_permission\n");
+//	bpf_printk("lsm_hook: file: file_permission\n");
 	return 0;
 }
 
@@ -770,7 +831,7 @@ int BPF_PROG(file_alloc_security, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_alloc_security, struct file *file)
 
-	bpf_printk("lsm_hook: file: file_alloc_security\n");
+//	bpf_printk("lsm_hook: file: file_alloc_security\n");
 	return 0;
 }
 
@@ -781,7 +842,7 @@ void BPF_PROG(file_free_security, struct file *file)
 	FILTER_OWN_PID_VOID()
 	DUMP_FUNC(file_free_security, struct file *file)
 
-	bpf_printk("lsm_hook: file: file_free_security\n");
+//	bpf_printk("lsm_hook: file: file_free_security\n");
 }
 
 SEC("lsm/file_ioctl")
@@ -793,7 +854,7 @@ int BPF_PROG(file_ioctl, struct file *file, unsigned int cmd,
 	DUMP_FUNC(file_ioctl, struct file *file, unsigned int cmd,
 	 unsigned long arg)
 
-	bpf_printk("lsm_hook: file: file_ioctl\n");
+//	bpf_printk("lsm_hook: file: file_ioctl\n");
 	return 0;
 }
 
@@ -804,7 +865,7 @@ int BPF_PROG(mmap_addr, unsigned long addr)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(mmap_addr, unsigned long addr)
 
-	bpf_printk("lsm_hook: file: mmap_addr\n");
+//	bpf_printk("lsm_hook: file: mmap_addr\n");
 	return 0;
 }
 
@@ -817,7 +878,7 @@ int BPF_PROG(mmap_file, struct file *file, unsigned long reqprot,
 	DUMP_FUNC(mmap_file, struct file *file, unsigned long reqprot,
 	 unsigned long prot, unsigned long flags)
 
-	bpf_printk("lsm_hook: file: mmap_file\n");
+//	bpf_printk("lsm_hook: file: mmap_file\n");
 	return 0;
 }
 
@@ -830,8 +891,7 @@ int BPF_PROG(file_mprotect, struct vm_area_struct *vma,
 	DUMP_FUNC(file_mprotect, struct vm_area_struct *vma,
 	 unsigned long reqprot, unsigned long prot)
 
-
-	bpf_printk("lsm_hook: file: file_mprotect\n");
+//	bpf_printk("lsm_hook: file: file_mprotect\n");
 	return 0;
 }
 
@@ -842,7 +902,7 @@ int BPF_PROG(file_lock, struct file *file, unsigned int cmd)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_lock, struct file *file, unsigned int cmd)
 
-	bpf_printk("lsm_hook: file: file_mprotect\n");
+//	bpf_printk("lsm_hook: file: file_mprotect\n");
 	return 0;
 }
 
@@ -855,7 +915,7 @@ int BPF_PROG(file_fcntl, struct file *file, unsigned int cmd,
 	DUMP_FUNC(file_fcntl, struct file *file, unsigned int cmd,
 	 unsigned long arg)
 
-	bpf_printk("lsm_hook: file: file_fcntl\n");
+//	bpf_printk("lsm_hook: file: file_fcntl\n");
 	return 0;
 }
 
@@ -866,7 +926,7 @@ int BPF_PROG(file_set_fowner, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_set_fowner, struct file *file)
 
-	bpf_printk("lsm_hook: file: file_set_fowner\n");
+//	bpf_printk("lsm_hook: file: file_set_fowner\n");
 	return 0;
 }
 
@@ -879,7 +939,7 @@ int BPF_PROG(file_send_sigiotask, struct task_struct *tsk,
 	DUMP_FUNC(file_send_sigiotask, struct task_struct *tsk,
 	 struct fown_struct *fown, int sig)
 
-	bpf_printk("lsm_hook: file: file_send_sigiotask\n");
+//	bpf_printk("lsm_hook: file: file_send_sigiotask\n");
 	return 0;
 }
 
@@ -890,7 +950,7 @@ int BPF_PROG(file_receive, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_receive, struct file *file)
 
-	bpf_printk("lsm_hook: file: file_receive\n");
+//	bpf_printk("lsm_hook: file: file_receive\n");
 	return 0;
 }
 
@@ -902,12 +962,13 @@ int BPF_PROG(file_open, struct file *file)
 	FILTER_CATHEGORY_INT(FILE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_open, struct file *file)
+	
 
-	DUMP_MEMBER_UINT(file->f_mode)
-	DUMP_MEMBER_UINT(file->f_path.dentry->d_flags)
-	DUMP_MEMBER_STR(file->f_path.dentry->d_name.name)
+//	DUMP_MEMBER_UINT(file->f_mode)
+//	DUMP_MEMBER_UINT(file->f_path.dentry->d_flags)
+//	DUMP_MEMBER_STR(file->f_path.dentry->d_name.name)
 
-	bpf_printk("lsm_hook: file: file_open\n");
+//	bpf_printk("lsm_hook: file: file_open\n");
 
 //	DUMP_STRUCT(file, 	STRUCT_FILE, 	file 				)
 //	DUMP_STRUCT(qstr, 	STRUCT_QSTR, 	&file->f_path.dentry->d_name 	)
@@ -926,7 +987,7 @@ int BPF_PROG(task_alloc, struct task_struct *task,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: task: task_alloc\n");
+//	bpf_printk("lsm_hook: task: task_alloc\n");
 	return 0;
 }
 
@@ -935,7 +996,7 @@ void BPF_PROG(task_free, struct task_struct *task)
 {
 	FILTER_OWN_PID_VOID()
 
-	bpf_printk("lsm_hook: task: task_free\n");
+//	bpf_printk("lsm_hook: task: task_free\n");
 }
 
 SEC("lsm/cred_alloc_blank")
@@ -943,7 +1004,7 @@ int BPF_PROG(cred_alloc_blank, struct cred *cred, gfp_t gfp)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: task: cred_alloc_blank\n");
+//	bpf_printk("lsm_hook: task: cred_alloc_blank\n");
 	return 0;
 }
 
@@ -952,7 +1013,7 @@ void BPF_PROG(cred_free, struct cred *cred)
 {
 	FILTER_OWN_PID_VOID()
 
-	bpf_printk("lsm_hook: task: cred_free\n");
+//	bpf_printk("lsm_hook: task: cred_free\n");
 }
 
 SEC("lsm/cred_prepare")
@@ -961,7 +1022,7 @@ int BPF_PROG(cred_prepare, struct cred *new, const struct cred *old,
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: task: cred_prepare\n");
+//	bpf_printk("lsm_hook: task: cred_prepare\n");
 	return 0;
 }
 
@@ -971,7 +1032,7 @@ void BPF_PROG(cred_transfer, struct cred *new,
 {
 	FILTER_OWN_PID_VOID()
 
-	bpf_printk("lsm_hook: task: cred_transfer\n");
+//	bpf_printk("lsm_hook: task: cred_transfer\n");
 }
 
 SEC("lsm/cred_getsecid")
@@ -979,7 +1040,7 @@ void BPF_PROG(cred_getsecid, const struct cred *c, u32 *secid)
 {
 	FILTER_OWN_PID_VOID()
 
-	bpf_printk("lsm_hook: task: cred_getsecid\n");
+//	bpf_printk("lsm_hook: task: cred_getsecid\n");
 }
 
 SEC("lsm/kernel_act_as")
@@ -987,7 +1048,7 @@ int BPF_PROG(kernel_act_as, struct cred *new, u32 secid)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: task: kernel_act_as\n");
+//	bpf_printk("lsm_hook: task: kernel_act_as\n");
 	return 0;
 }
 
@@ -996,7 +1057,7 @@ int BPF_PROG(kernel_create_files_as, struct cred *new, struct inode *inode)
 {
 	FILTER_OWN_PID_INT()
 
-	bpf_printk("lsm_hook: task: kernel_create_files_as\n");
+//	bpf_printk("lsm_hook: task: kernel_create_files_as\n");
 	return 0;
 }
 
