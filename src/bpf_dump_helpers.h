@@ -54,19 +54,21 @@ char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 /* Dirty macro hacks to work around libbpf lack of string locals */
 
 #define DUMP_FUNC(FNAME, ...) {									\
-	const char func_call_name[] = #FNAME;						\
-	const char func_call_args[] = #__VA_ARGS__;					\
+	const char func_call_name[] = #FNAME;							\
+	const char func_call_args[] = #__VA_ARGS__;						\
 	dump_func(func_call_name, func_call_args);						\
 }	
 
-#define DUMP_MEMBER_UINT(MPTR) {	 							\
-	char dump_member_name[] = #MPTR;							\
-	dump_uint_member(dump_member_name, MPTR);						\
+#define DUMP_MEMBER_UINT(...) {									\
+	const char dump_member_name[] = #__VA_ARGS__;						\
+	unsigned int mptr = BPF_CORE_READ(__VA_ARGS__);						\
+	dump_uint_member(dump_member_name, mptr);						\
 }
 
-#define DUMP_MEMBER_STR(MPTR) {		 							\
-	char dump_member_name[] = #MPTR;							\
-	dump_str_member(dump_member_name, MPTR);						\
+#define DUMP_MEMBER_STR(...) {		 							\
+	const char dump_member_name[] = #__VA_ARGS__;						\
+	const unsigned char *mptr = BPF_CORE_READ(__VA_ARGS__);					\
+	dump_str_member(dump_member_name, mptr);						\
 }
 
 
@@ -114,7 +116,7 @@ static int dump_uint_member(const char *mname, unsigned int mptr) {
 }
 
 
-static int dump_str_member(const char *mname, const char *mptr) {
+static int dump_str_member(const char *mname, const unsigned char *mptr) {
 
 	struct str_member_Event *evt; 								
 	char uint_member_label[] = "MEMBER_DUMP";

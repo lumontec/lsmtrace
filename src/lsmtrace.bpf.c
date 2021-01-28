@@ -963,10 +963,9 @@ int BPF_PROG(file_open, struct file *file)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(file_open, struct file *file)
 	
-
-//	DUMP_MEMBER_UINT(file->f_mode)
-//	DUMP_MEMBER_UINT(file->f_path.dentry->d_flags)
-//	DUMP_MEMBER_STR(file->f_path.dentry->d_name.name)
+	DUMP_MEMBER_UINT(file,f_mode)
+	DUMP_MEMBER_UINT(file,f_path.dentry,d_flags)
+	DUMP_MEMBER_STR (file,f_path.dentry,d_name.name)
 
 //	bpf_printk("lsm_hook: file: file_open\n");
 
