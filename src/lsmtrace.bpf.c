@@ -2236,6 +2236,318 @@ int BPF_PROG(msg_queue_msgrcv, struct kern_ipc_perm *perm,
 }
 
 
+/* Security hooks for System V Shared Memory Segments */
+
+SEC("lsm/shm_alloc_security")
+int BPF_PROG(shm_alloc_security, struct kern_ipc_perm *perm)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(shm_alloc_security, struct kern_ipc_perm *perm)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: shm_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/shm_free_security")
+void BPF_PROG(shm_free_security, struct kern_ipc_perm *perm)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(shm_free_security, struct kern_ipc_perm *perm)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: shm_free_security\n");
+	return;
+}
+
+SEC("lsm/shm_associate")
+int BPF_PROG(shm_associate, struct kern_ipc_perm *perm, int shmflg)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(shm_associate, struct kern_ipc_perm *perm, int shmflg)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: shm_associate\n");
+	return 0;
+}
+
+SEC("lsm/shm_shmctl")
+int BPF_PROG(shm_shmctl, struct kern_ipc_perm *perm, int cmd)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(shm_shmctl, struct kern_ipc_perm *perm, int cmd)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: shm_shmctl\n");
+	return 0;
+}
+
+//SEC("lsm/shm_shmat")
+//int BPF_PROG(shm_shmat, struct kern_ipc_perm *perm, char __user *shmaddr,
+//	 int shmflg)
+//{
+//	FILTER_OWN_PID_INT()
+//	DUMP_FUNC(shm_shmat, struct kern_ipc_perm *perm, char __user *shmaddr,
+//	 int shmflg)
+//
+//	bpf_printk("lsm_hook: systemv_ipc_shmem: shm_shmat\n");
+//	return 0;
+//}
+
+
+
+/* Security hooks for System V Semaphores */
+
+SEC("lsm/sem_alloc_security")
+int BPF_PROG(sem_alloc_security, struct kern_ipc_perm *perm)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(sem_alloc_security, struct kern_ipc_perm *perm)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: sem_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/sem_free_security")
+void BPF_PROG(sem_free_security, struct kern_ipc_perm *perm)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(sem_free_security, struct kern_ipc_perm *perm)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: sem_free_security\n");
+	return;
+}
+
+SEC("lsm/sem_associate")
+int BPF_PROG(sem_associate, struct kern_ipc_perm *perm, int semflg)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(sem_associate, struct kern_ipc_perm *perm, int semflg)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: sem_associate\n");
+	return 0;
+}
+
+SEC("lsm/sem_semctl")
+int BPF_PROG(sem_semctl, struct kern_ipc_perm *perm, int cmd)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(sem_semctl, struct kern_ipc_perm *perm, int cmd)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: sem_semctl\n");
+	return 0;
+}
+
+SEC("lsm/sem_semop")
+int BPF_PROG(sem_semop, struct kern_ipc_perm *perm, struct sembuf *sops,
+	 unsigned nsops, int alter)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(sem_semop, struct kern_ipc_perm *perm, struct sembuf *sops,
+	 unsigned nsops, int alter)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: sem_semop\n");
+	return 0;
+}
+
+SEC("lsm/binder_set_context_mgr")
+int BPF_PROG(binder_set_context_mgr, struct task_struct *mgr)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(binder_set_context_mgr, struct task_struct *mgr)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: binder_set_context_mgr\n");
+	return 0;
+}
+
+SEC("lsm/binder_transaction")
+int BPF_PROG(binder_transaction, struct task_struct *from,
+	 struct task_struct *to)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(binder_transaction, struct task_struct *from,
+	 struct task_struct *to)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: binder_transaction\n");
+	return 0;
+}
+
+SEC("lsm/binder_transfer_binder")
+int BPF_PROG(binder_transfer_binder, struct task_struct *from,
+	 struct task_struct *to)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(binder_transfer_binder, struct task_struct *from,
+	 struct task_struct *to)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: binder_transfer_binder\n");
+	return 0;
+}
+
+SEC("lsm/binder_transfer_file")
+int BPF_PROG(binder_transfer_file, struct task_struct *from,
+	 struct task_struct *to, struct file *file)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(binder_transfer_file, struct task_struct *from,
+	 struct task_struct *to, struct file *file)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: binder_transfer_file\n");
+	return 0;
+}
+
+SEC("lsm/ptrace_access_check")
+int BPF_PROG(ptrace_access_check, struct task_struct *child,
+	 unsigned int mode)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(ptrace_access_check, struct task_struct *child,
+	 unsigned int mode)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: ptrace_access_check\n");
+	return 0;
+}
+
+SEC("lsm/ptrace_traceme")
+int BPF_PROG(ptrace_traceme, struct task_struct *parent)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(ptrace_traceme, struct task_struct *parent)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: ptrace_traceme\n");
+	return 0;
+}
+
+SEC("lsm/capget")
+int BPF_PROG(capget, struct task_struct *target, kernel_cap_t *effective,
+	 kernel_cap_t *inheritable, kernel_cap_t *permitted)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(capget, struct task_struct *target, kernel_cap_t *effective,
+	 kernel_cap_t *inheritable, kernel_cap_t *permitted)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: capget\n");
+	return 0;
+}
+
+SEC("lsm/capset")
+int BPF_PROG(capset, struct cred *new, const struct cred *old,
+	 const kernel_cap_t *effective, const kernel_cap_t *inheritable,
+	 const kernel_cap_t *permitted)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(capset, struct cred *new, const struct cred *old,
+	 const kernel_cap_t *effective, const kernel_cap_t *inheritable,
+	 const kernel_cap_t *permitted)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: capset\n");
+	return 0;
+}
+
+SEC("lsm/capable")
+int BPF_PROG(capable, const struct cred *cred, struct user_namespace *ns,
+	 int cap, unsigned int opts)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(capable, const struct cred *cred, struct user_namespace *ns,
+	 int cap, unsigned int opts)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: capable\n");
+	return 0;
+}
+
+SEC("lsm/quotactl")
+int BPF_PROG(quotactl, int cmds, int type, int id, struct super_block *sb)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(quotactl, int cmds, int type, int id, struct super_block *sb)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: quotactl\n");
+	return 0;
+}
+
+SEC("lsm/quota_on")
+int BPF_PROG(quota_on, struct dentry *dentry)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(quota_on, struct dentry *dentry)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: quota_on\n");
+	return 0;
+}
+
+SEC("lsm/syslog")
+int BPF_PROG(syslog, int type)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(syslog, int type)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: syslog\n");
+	return 0;
+}
+
+SEC("lsm/settime")
+int BPF_PROG(settime, const struct timespec64 *ts,
+	 const struct timezone *tz)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(settime, const struct timespec64 *ts,
+	 const struct timezone *tz)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: settime\n");
+	return 0;
+}
+
+SEC("lsm/vm_enough_memory")
+int BPF_PROG(vm_enough_memory, struct mm_struct *mm, long pages)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(vm_enough_memory, struct mm_struct *mm, long pages)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: vm_enough_memory\n");
+	return 0;
+}
+
+SEC("lsm/ismaclabel")
+int BPF_PROG(ismaclabel, const char *name)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(ismaclabel, const char *name)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: ismaclabel\n");
+	return 0;
+}
+
+SEC("lsm/secid_to_secctx")
+int BPF_PROG(secid_to_secctx, u32 secid, char **secdata,
+	 u32 *seclen)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(secid_to_secctx, u32 secid, char **secdata,
+	 u32 *seclen)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: secid_to_secctx\n");
+	return 0;
+}
+
+SEC("lsm/secctx_to_secid")
+int BPF_PROG(secctx_to_secid, const char *secdata, u32 seclen, u32 *secid)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(secctx_to_secid, const char *secdata, u32 seclen, u32 *secid)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: secctx_to_secid\n");
+	return 0;
+}
+
+SEC("lsm/release_secctx")
+void BPF_PROG(release_secctx, char *secdata, u32 seclen)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(release_secctx, char *secdata, u32 seclen)
+
+	bpf_printk("lsm_hook: systemv_ipc_shmem: release_secctx\n");
+	return;
+}
+
+
+
 
 
 
