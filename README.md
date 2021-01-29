@@ -25,12 +25,12 @@ $ sudo ./lsmtrace /usr/bin/ls -a /home$ cd src
 
 Attaching hooks, don`t rush..
 
--> FUNCTION_CALL: -> file_alloc_security( struct file *file )
-     file,f_mode = 0
-     file,f_path.dentry,d_flags = 0
-     file,f_path.dentry,d_name.name = 
--> FUNCTION_CALL: -> inode_permission( struct inode *inode, int mask )
--> FUNCTION_CALL: -> inode_permission( struct inode *inode, int mask )
+-> HOOK_CALL: -> cred_getsecid( const struct cred *c, u32 *secid )
+-> HOOK_CALL: -> file_permission( struct file *file, int mask )
+     file,f_mode = 32797
+     file,f_path.dentry,d_flags = 64
+     file,f_path.dentry,d_name.name = ls
+     file,f_path.dentry,d_inode,i_ino = 3670696
 ...
 ```
 
