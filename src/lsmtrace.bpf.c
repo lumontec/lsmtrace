@@ -1478,13 +1478,157 @@ int BPF_PROG(netlink_send, struct sock *sk, struct sk_buff *skb)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(netlink_send, struct sock *sk, struct sk_buff *skb)
 
-	bpf_printk("lsm_hook: task: netlink_send\n");
+	bpf_printk("lsm_hook: netlink: netlink_send\n");
 	return 0;
 }
 
 
+/* Security hooks for Unix domain networking. */
+
+SEC("lsm/unix_stream_connect")
+int BPF_PROG(unix_stream_connect, struct sock *sock, struct sock *other,
+	 struct sock *newsk)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(unix_stream_connect, struct sock *sock, struct sock *other,
+	 struct sock *newsk)
+
+	bpf_printk("lsm_hook: unix_domain: unix_stream_connect\n");
+	return 0;
+}
+
+SEC("lsm/unix_may_send")
+int BPF_PROG(unix_may_send, struct socket *sock, struct socket *other)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(unix_may_send, struct socket *sock, struct socket *other)
+
+	bpf_printk("lsm_hook: unix_domain: unix_may_send\n");
+	return 0;
+}
 
 
+/* Security hooks for socket operations. */
+
+SEC("lsm/socket_create")
+int BPF_PROG(socket_create, int family, int type, int protocol, int kern)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_create, int family, int type, int protocol, int kern)
+
+	bpf_printk("lsm_hook: socket: socket_create\n");
+	return 0;
+}
+
+SEC("lsm/socket_post_create")
+int BPF_PROG(socket_post_create, struct socket *sock, int family, int type,
+	 int protocol, int kern)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_post_create, struct socket *sock, int family, int type,
+	 int protocol, int kern)
+
+	bpf_printk("lsm_hook: socket: socket_post_create\n");
+	return 0;
+}
+
+SEC("lsm/socket_socketpair")
+int BPF_PROG(socket_socketpair, struct socket *socka, struct socket *sockb)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_socketpair, struct socket *socka, struct socket *sockb)
+
+	bpf_printk("lsm_hook: socket: socket_socketpair\n");
+	return 0;
+}
+
+SEC("lsm/socket_bind")
+int BPF_PROG(socket_bind, struct socket *sock, struct sockaddr *address,
+	 int addrlen)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_bind, struct socket *sock, struct sockaddr *address,
+	 int addrlen)
+
+	bpf_printk("lsm_hook: socket: socket_bind\n");
+	return 0;
+}
+
+SEC("lsm/socket_connect")
+int BPF_PROG(socket_connect, struct socket *sock, struct sockaddr *address,
+	 int addrlen)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_connect, struct socket *sock, struct sockaddr *address,
+	 int addrlen)
+
+	bpf_printk("lsm_hook: socket: socket_connect\n");
+	return 0;
+}
+
+SEC("lsm/socket_listen")
+int BPF_PROG(socket_listen, struct socket *sock, int backlog)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_listen, struct socket *sock, int backlog)
+
+	bpf_printk("lsm_hook: socket: socket_listen\n");
+	return 0;
+}
+
+SEC("lsm/socket_accept")
+int BPF_PROG(socket_accept, struct socket *sock, struct socket *newsock)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_accept, struct socket *sock, struct socket *newsock)
+
+	bpf_printk("lsm_hook: socket: socket_accept\n");
+	return 0;
+}
+
+SEC("lsm/socket_sendmsg")
+int BPF_PROG(socket_sendmsg, struct socket *sock, struct msghdr *msg,
+	 int size)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_sendmsg, struct socket *sock, struct msghdr *msg,
+	 int size)
+
+	bpf_printk("lsm_hook: socket: socket_sendmsg\n");
+	return 0;
+}
+
+SEC("lsm/socket_recvmsg")
+int BPF_PROG(socket_recvmsg, struct socket *sock, struct msghdr *msg,
+	 int size, int flags)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_recvmsg, struct socket *sock, struct msghdr *msg,
+	 int size, int flags)
+
+	bpf_printk("lsm_hook: socket: socket_recvmsg\n");
+	return 0;
+}
+
+SEC("lsm/socket_getsockname")
+int BPF_PROG(socket_getsockname, struct socket *sock)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_getsockname, struct socket *sock)
+
+	bpf_printk("lsm_hook: socket: socket_getsockname\n");
+	return 0;
+}
+
+SEC("lsm/socket_getpeername")
+int BPF_PROG(socket_getpeername, struct socket *sock)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_getpeername, struct socket *sock)
+
+	bpf_printk("lsm_hook: socket: socket_getpeername\n");
+	return 0;
+}
 
 
 
