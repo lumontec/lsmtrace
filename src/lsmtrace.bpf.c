@@ -2547,6 +2547,259 @@ void BPF_PROG(release_secctx, char *secdata, u32 seclen)
 }
 
 
+/* Security hooks for Audit */
+
+SEC("lsm/audit_rule_init")
+int BPF_PROG(audit_rule_init, u32 field, u32 op, char *rulestr,
+	 void **lsmrule)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(audit_rule_init, u32 field, u32 op, char *rulestr,
+	 void **lsmrule)
+
+	bpf_printk("lsm_hook: audit: audit_rule_init\n");
+	return 0;
+}
+
+SEC("lsm/audit_rule_known")
+int BPF_PROG(audit_rule_known, struct audit_krule *krule)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(audit_rule_known, struct audit_krule *krule)
+
+	bpf_printk("lsm_hook: audit: audit_rule_known\n");
+	return 0;
+}
+
+SEC("lsm/audit_rule_match")
+int BPF_PROG(audit_rule_match, u32 secid, u32 field, u32 op, void *lsmrule)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(audit_rule_match, u32 secid, u32 field, u32 op, void *lsmrule)
+
+	bpf_printk("lsm_hook: audit: audit_rule_match\n");
+	return 0;
+}
+
+SEC("lsm/audit_rule_free")
+void BPF_PROG(audit_rule_free, void *lsmrule)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(audit_rule_free, void *lsmrule)
+
+	bpf_printk("lsm_hook: audit: audit_rule_free\n");
+	return;
+}
+
+SEC("lsm/inode_invalidate_secctx")
+void BPF_PROG(inode_invalidate_secctx, struct inode *inode)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(inode_invalidate_secctx, struct inode *inode)
+
+	bpf_printk("lsm_hook: audit: inode_invalidate_secctx\n");
+	return;
+}
+
+SEC("lsm/inode_notifysecctx")
+int BPF_PROG(inode_notifysecctx, struct inode *inode, void *void_ctx, u32 ctxlen)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_notifysecctx, struct inode *inode, void *void_ctx, u32 ctxlen)
+
+	bpf_printk("lsm_hook: audit: inode_notifysecctx\n");
+	return 0;
+}
+
+SEC("lsm/inode_setsecctx")
+int BPF_PROG(inode_setsecctx, struct dentry *dentry, void *void_ctx, u32 ctxlen)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_setsecctx, struct dentry *dentry, void *void_ctx, u32 ctxlen)
+
+	bpf_printk("lsm_hook: audit: inode_setsecctx\n");
+	return 0;
+}
+
+SEC("lsm/inode_getsecctx")
+int BPF_PROG(inode_getsecctx, struct inode *inode, void **void_ctx,
+	 u32 *ctxlen)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inode_getsecctx, struct inode *inode, void **void_ctx,
+	 u32 *ctxlen)
+
+	bpf_printk("lsm_hook: audit: inode_getsecctx\n");
+	return 0;
+}
+
+
+/* Security hooks for the general notification queue: */
+
+
+SEC("lsm/post_notification")
+int BPF_PROG(post_notification, const struct cred *w_cred,
+	 const struct cred *cred, struct watch_notification *n)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(post_notification, const struct cred *w_cred,
+	 const struct cred *cred, struct watch_notification *n)
+
+	bpf_printk("lsm_hook: notification_queue: post_notification\n");
+	return 0;
+}
+
+SEC("lsm/watch_key")
+int BPF_PROG(watch_key, struct key *key)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(watch_key, struct key *key)
+
+	bpf_printk("lsm_hook: notification_queue: watch_key\n");
+	return 0;
+}
+
+
+/* Security hooks for using the eBPF maps and programs functionalities through 
+  eBPF syscalls. */
+
+SEC("lsm/bpf")
+int BPF_PROG(bpf, int cmd, union bpf_attr *attr, unsigned int size)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(bpf, int cmd, union bpf_attr *attr, unsigned int size)
+
+	bpf_printk("lsm_hook: bpf: bpf\n");
+	return 0;
+}
+
+SEC("lsm/bpf_map")
+int BPF_PROG(bpf_map, struct bpf_map *map, fmode_t fmode)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(bpf_map, struct bpf_map *map, fmode_t fmode)
+
+	bpf_printk("lsm_hook: bpf: bpf_map\n");
+	return 0;
+}
+
+SEC("lsm/bpf_prog")
+int BPF_PROG(bpf_prog, struct bpf_prog *prog)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(bpf_prog, struct bpf_prog *prog)
+
+	bpf_printk("lsm_hook: bpf: bpf_prog\n");
+	return 0;
+}
+
+SEC("lsm/bpf_map_alloc_security")
+int BPF_PROG(bpf_map_alloc_security, struct bpf_map *map)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(bpf_map_alloc_security, struct bpf_map *map)
+
+	bpf_printk("lsm_hook: bpf: bpf_map_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/bpf_map_free_security")
+void BPF_PROG(bpf_map_free_security, struct bpf_map *map)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(bpf_map_free_security, struct bpf_map *map)
+
+	bpf_printk("lsm_hook: bpf: bpf_map_alloc_security\n");
+	return;
+}
+
+SEC("lsm/bpf_prog_alloc_security")
+int BPF_PROG(bpf_prog_alloc_security, struct bpf_prog_aux *aux)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(bpf_prog_alloc_security, struct bpf_prog_aux *aux)
+
+	bpf_printk("lsm_hook: bpf: bpf_prog_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/bpf_prog_free_security")
+void BPF_PROG(bpf_prog_free_security, struct bpf_prog_aux *aux)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(bpf_prog_free_security, struct bpf_prog_aux *aux)
+
+	bpf_printk("lsm_hook: bpf: bpf_prog_free_security\n");
+	return;
+}
+
+SEC("lsm/locked_down")
+int BPF_PROG(locked_down, enum lockdown_reason what)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(locked_down, enum lockdown_reason what)
+
+	bpf_printk("lsm_hook: bpf: locked_down\n");
+	return 0;
+}
+
+
+/* Security hooks for perf events */
+
+SEC("lsm/perf_event_open")
+int BPF_PROG(perf_event_open, struct perf_event_attr *attr, int type)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(perf_event_open, struct perf_event_attr *attr, int type)
+
+	bpf_printk("lsm_hook: perf_events: perf_event_open\n");
+	return 0;
+}
+
+SEC("lsm/perf_event_alloc")
+int BPF_PROG(perf_event_alloc, struct perf_event *event)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(perf_event_alloc, struct perf_event *event)
+
+	bpf_printk("lsm_hook: perf_events: perf_event_alloc\n");
+	return 0;
+}
+
+SEC("lsm/perf_event_free")
+void BPF_PROG(perf_event_free, struct perf_event *event)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(perf_event_free, struct perf_event *event)
+
+	bpf_printk("lsm_hook: perf_events: perf_event_free\n");
+	return;
+}
+
+SEC("lsm/perf_event_read")
+int BPF_PROG(perf_event_read, struct perf_event *event)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(perf_event_read, struct perf_event *event)
+
+	bpf_printk("lsm_hook: perf_events: perf_event_read\n");
+	return 0;
+}
+
+SEC("lsm/perf_event_write")
+int BPF_PROG(perf_event_write, struct perf_event *event)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(perf_event_write, struct perf_event *event)
+
+	bpf_printk("lsm_hook: perf_events: perf_event_write\n");
+	return 0;
+}
+
+
+
+
+
 
 
 
