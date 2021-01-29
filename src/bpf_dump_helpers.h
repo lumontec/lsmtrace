@@ -77,9 +77,15 @@ char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 	dump_llint_member(dump_member_name, mptr);						\
 }
 
-#define DUMP_MEMBER_STR(...) {		 							\
+#define DUMP_MEMBER_USTR(...) {		 							\
 	const char dump_member_name[] = #__VA_ARGS__;						\
 	const unsigned char *mptr = BPF_CORE_READ(__VA_ARGS__);					\
+	dump_ustr_member(dump_member_name, mptr);						\
+}
+
+#define DUMP_MEMBER_STR(...) {		 							\
+	const char dump_member_name[] = #__VA_ARGS__;						\
+	const char *mptr = BPF_CORE_READ(__VA_ARGS__);						\
 	dump_str_member(dump_member_name, mptr);						\
 }
 
@@ -170,7 +176,7 @@ static long dump_llint_member(const char *mname, unsigned int mptr) {
 
 
 
-static int dump_str_member(const char *mname, const unsigned char *mptr) {
+static int dump_str_member(const char *mname, const char *mptr) {
 
 	struct str_member_Event *evt; 								
 	char uint_member_label[] = "MEMBER_DUMP";
@@ -190,6 +196,26 @@ static int dump_str_member(const char *mname, const unsigned char *mptr) {
 	return 0;
 }
 
+
+static int dump_ustr_member(const char *mname, const unsigned char *mptr) {
+
+	struct str_member_Event *evt; 								
+	char uint_member_label[] = "MEMBER_DUMP";
+
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
+
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = MEMBER_STR;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), uint_member_label);	
+	bpf_probe_read_str(evt->member, sizeof(evt->member), mptr);				
+	bpf_probe_read_str(evt->msg, sizeof(evt->msg), mname);				
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
+}
 
 
 
