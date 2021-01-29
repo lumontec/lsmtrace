@@ -271,46 +271,6 @@ static int dump_ustr_member(const char *mname, const unsigned char *mptr) {
 
 
 
-
-
-
-
-
-
-//#define DUMP_MEMBER_INT(MPTR)		 							\
-//{												\
-//	struct int_member_Event *evt; 								\
-//												\
-//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			\
-//												\
-//	if (!evt)										\
-//		return -1;									\
-//												\
-//	evt->super.etype = MEMBER_INT;								\
-//	bpf_probe_read_kernel(&evt->member, sizeof(evt->member), MPTR);				\
-//												\
-//	bpf_ringbuf_submit(evt, ringbuffer_flags);						\
-//}
-
-
-//#define DUMP_MEMBER_STR(MPTR)		 							\
-//{												\
-//	struct int_member_Event *evt; 								\
-//												\
-//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			\
-//												\
-//	if (!evt)										\
-//		return -1;									\
-//												\
-//	evt->super.etype = MEMBER_STR;								\
-//	bpf_probe_read_kernel(&evt->member, sizeof(evt->member), MPTR);				\
-//												\
-//	bpf_ringbuf_submit(evt, ringbuffer_flags);						\
-//}
-//
-
-
-
 //#define DUMP_STRUCT(STYPE, ETYPE, SPTR) 							\
 //{												\
 ///*	struct STYPE *STYPE;									\
