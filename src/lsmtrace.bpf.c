@@ -22,23 +22,54 @@
 #include "bpf_dump_structs.h"
 #include "events.h"
 
+// Syscall helpers to trace syscall happening
 
+SEC("tracepoint/raw_syscalls/sys_enter")
+int sys_enter(struct trace_event_raw_sys_enter *args)
+{
+	FILTER_OWN_PID_INT()
 
+	struct sys_enter_Event *evt; 								
+	char sys_enter_label[] = "SYS_CALL_ENTER";
 
-//SEC("tp/syscalls/sys_enter_write")
-//int handle_tp(void *ctx)
-//{
-//
-//	FILTER_OWN_PID_INT()
-//
-//	long pid_tgid = bpf_get_current_pid_tgid();
-//	bpf_printk("BPF trigger my_pid: %d.\n", my_pid);
-//	bpf_printk("BPF trigger pid: %d.\n", pid_tgid >> 32);
-//	bpf_printk("BPF trigger tgid: %d.\n", pid_tgid);
-//
-//	return 0;
-//}
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
 
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = SYS_CALL_ENTER;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), sys_enter_label);	
+	evt->id = BPF_CORE_READ(args, id);
+
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
+}
+
+SEC("tracepoint/raw_syscalls/sys_exit")
+int sys_exit(struct trace_event_raw_sys_exit *args)
+{
+	FILTER_OWN_PID_INT()
+
+	struct sys_exit_Event *evt; 								
+	char sys_exit_label[] = "SYS_CALL_EXIT";
+
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
+
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = SYS_CALL_EXIT;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), sys_exit_label);	
+	evt->id = BPF_CORE_READ(args, id);
+	evt->ret = BPF_CORE_READ(args, ret);
+
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
+}
 
 
 //  Security hooks for program execution operations. 
@@ -64,6 +95,7 @@ int BPF_PROG(bprm_creds_from_file, struct linux_binprm *bprm, struct file *file)
 	DUMP_FUNC(bprm_creds_from_file, struct linux_binprm *bprm, struct file *file)
 
 	DUMP_LINUX_BINPRM_STRUCT(bprm)
+	DUMP_FILE_STRUCT(file)
 
 //	bpf_printk("lsm_hook: exec: bprm_creds_from_file\n");
 	return 0;
@@ -359,6 +391,8 @@ int BPF_PROG(inode_alloc_security, struct inode *inode)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(inode_alloc_security, struct inode *inode)
 
+	DUMP_INODE_STRUCT(inode)
+
 //	bpf_printk("lsm_hook: inode: inode_alloc_security\n");
 	return 0;
 }
@@ -369,6 +403,8 @@ void BPF_PROG(inode_free_security, struct inode *inode)
 	FILTER_CATHEGORY_VOID(INODE_CATH)
 	FILTER_OWN_PID_VOID()
 	DUMP_FUNC(inode_free_security, struct inode *inode)
+
+	DUMP_INODE_STRUCT(inode)
 
 //	bpf_printk("lsm_hook: inode: inode_free_security\n");
 }
@@ -384,12 +420,14 @@ int BPF_PROG(inode_init_security, struct inode *inode,
 	 struct inode *dir, const struct qstr *qstr, const char **name,
 	 void **value, size_t *len)
 
+	DUMP_INODE_STRUCT(inode)
+
 //	bpf_printk("lsm_hook: inode: inode_init_security\n");
 	return 0;
 }
 
 SEC("lsm/inode_create")
-int BPF_PROG(inode_create, struct inode *dir, struct dentry *dentry,
+int BPF_PROG(inode_create, struct inode *inode_dir, struct dentry *dentry,
 	 umode_t mode)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
@@ -397,12 +435,14 @@ int BPF_PROG(inode_create, struct inode *dir, struct dentry *dentry,
 	DUMP_FUNC(inode_create, struct inode *dir, struct dentry *dentry,
 	 umode_t mode)
 
+	DUMP_INODE_STRUCT(inode_dir)
+
 //	bpf_printk("lsm_hook: inode: inode_create\n");
 	return 0;
 }
 
 SEC("lsm/inode_link")
-int BPF_PROG(inode_link, struct dentry *old_dentry, struct inode *dir,
+int BPF_PROG(inode_link, struct dentry *old_dentry, struct inode *inode_dir,
 	 struct dentry *new_dentry)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
@@ -411,7 +451,9 @@ int BPF_PROG(inode_link, struct dentry *old_dentry, struct inode *dir,
 	 struct dentry *new_dentry)
 
 	DUMP_DENTRY_STRUCT(old_dentry)
+	DUMP_INODE_STRUCT(inode_dir)
 	DUMP_DENTRY_STRUCT(new_dentry)
+
 
 //	bpf_printk("lsm_hook: inode: inode_link\n");
 	return 0;
@@ -434,12 +476,13 @@ int BPF_PROG(path_link, struct dentry *old_dentry,
 }
 
 SEC("lsm/inode_unlink")
-int BPF_PROG(inode_unlink, struct inode *dir, struct dentry *dentry)
+int BPF_PROG(inode_unlink, struct inode *inode_dir, struct dentry *dentry)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(inode_unlink, struct inode *dir, struct dentry *dentry)
 
+	DUMP_INODE_STRUCT(inode_dir)
 	DUMP_DENTRY_STRUCT(dentry)
 
 //	bpf_printk("lsm_hook: inode: inode_unlink\n");
@@ -460,7 +503,7 @@ int BPF_PROG(path_unlink, const struct path *dir, struct dentry *dentry)
 }
 
 SEC("lsm/inode_symlink")
-int BPF_PROG(inode_symlink, struct inode *dir, struct dentry *dentry,
+int BPF_PROG(inode_symlink, struct inode *inode_dir, struct dentry *dentry,
 	 const char *old_name)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
@@ -468,6 +511,7 @@ int BPF_PROG(inode_symlink, struct inode *dir, struct dentry *dentry,
 	DUMP_FUNC(inode_symlink, struct inode *dir, struct dentry *dentry,
 	 const char *old_name)
 
+	DUMP_INODE_STRUCT(inode_dir)
 	DUMP_DENTRY_STRUCT(dentry)
 
 //	bpf_printk("lsm_hook: inode: inode_symlink\n");
@@ -490,7 +534,7 @@ int BPF_PROG(path_symlink, const struct path *dir, struct dentry *dentry,
 }
 
 SEC("lsm/inode_mkdir")
-int BPF_PROG(inode_mkdir, struct inode *dir, struct dentry *dentry,
+int BPF_PROG(inode_mkdir, struct inode *inode_dir, struct dentry *dentry,
 	 umode_t mode)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
@@ -498,6 +542,7 @@ int BPF_PROG(inode_mkdir, struct inode *dir, struct dentry *dentry,
 	DUMP_FUNC(inode_mkdir, struct inode *dir, struct dentry *dentry,
 	 umode_t mode)
 
+	DUMP_INODE_STRUCT(inode_dir)
 	DUMP_DENTRY_STRUCT(dentry)
 
 //	bpf_printk("lsm_hook: inode: inode_mkdir\n");
@@ -520,12 +565,13 @@ int BPF_PROG(path_mkdir, const struct path *dir, struct dentry *dentry,
 }
 
 SEC("lsm/inode_rmdir")
-int BPF_PROG(inode_rmdir, struct inode *dir, struct dentry *dentry)
+int BPF_PROG(inode_rmdir, struct inode *inode_dir, struct dentry *dentry)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(inode_rmdir, struct inode *dir, struct dentry *dentry)
 
+	DUMP_INODE_STRUCT(inode_dir)
 	DUMP_DENTRY_STRUCT(dentry)
 
 //	bpf_printk("lsm_hook: inode: inode_rmdir\n");
@@ -546,7 +592,7 @@ int BPF_PROG(path_rmdir, const struct path *dir, struct dentry *dentry)
 }
 
 SEC("lsm/inode_mknod")
-int BPF_PROG(inode_mknod, struct inode *dir, struct dentry *dentry,
+int BPF_PROG(inode_mknod, struct inode *inode_dir, struct dentry *dentry,
 	 umode_t mode, dev_t dev)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
@@ -554,6 +600,7 @@ int BPF_PROG(inode_mknod, struct inode *dir, struct dentry *dentry,
 	DUMP_FUNC(inode_mknod, struct inode *dir, struct dentry *dentry,
 	 umode_t mode, dev_t dev)
 
+	DUMP_INODE_STRUCT(inode_dir)
 	DUMP_DENTRY_STRUCT(dentry)
 
 //	bpf_printk("lsm_hook: inode: inode_mknod\n");
@@ -561,15 +608,17 @@ int BPF_PROG(inode_mknod, struct inode *dir, struct dentry *dentry,
 }
 
 SEC("lsm/inode_rename")
-int BPF_PROG(inode_rename, struct inode *old_dir, struct dentry *old_dentry,
-	 struct inode *new_dir, struct dentry *new_dentry)
+int BPF_PROG(inode_rename, struct inode *old_inode_dir, struct dentry *old_dentry,
+	 struct inode *new_inode_dir, struct dentry *new_dentry)
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(inode_rename, struct inode *old_dir, struct dentry *old_dentry,
 	 struct inode *new_dir, struct dentry *new_dentry)
 
+	DUMP_INODE_STRUCT(old_inode_dir)
 	DUMP_DENTRY_STRUCT(old_dentry)
+	DUMP_INODE_STRUCT(new_inode_dir)
 	DUMP_DENTRY_STRUCT(new_dentry)
 
 //	bpf_printk("lsm_hook: inode: inode_rename\n");
@@ -659,6 +708,7 @@ int BPF_PROG(inode_follow_link, struct dentry *dentry, struct inode *inode,
 	 bool rcu)
 
 	DUMP_DENTRY_STRUCT(dentry)
+	DUMP_INODE_STRUCT(inode)
 
 //	bpf_printk("lsm_hook: inode: inode_follow_link\n");
 	return 0;
@@ -670,6 +720,8 @@ int BPF_PROG(inode_permission, struct inode *inode, int mask)
 	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
 	DUMP_FUNC(inode_permission, struct inode *inode, int mask)
+
+	DUMP_INODE_STRUCT(inode)
 
 //	bpf_printk("lsm_hook: inode: inode_permission\n");
 	return 0;
@@ -776,6 +828,8 @@ int BPF_PROG(inode_getsecurity, struct inode *inode,
 	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
 
+	DUMP_INODE_STRUCT(inode)
+
 //	bpf_printk("lsm_hook: inode: inode_getsecurity\n");
 	return 0;
 }
@@ -786,6 +840,8 @@ int BPF_PROG(inode_setsecurity, struct inode *inode,
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+
+	DUMP_INODE_STRUCT(inode)
 
 //	bpf_printk("lsm_hook: inode: inode_setsecurity\n");
 	return 0;
@@ -798,6 +854,8 @@ int BPF_PROG(inode_listsecurity, struct inode *inode, char *buffer,
 {
 	FILTER_CATHEGORY_INT(INODE_CATH)
 	FILTER_OWN_PID_INT()
+
+	DUMP_INODE_STRUCT(inode)
 
 //	bpf_printk("lsm_hook: inode: inode_listsecurity\n");
 	return 0;
@@ -833,6 +891,7 @@ void BPF_PROG(inode_getsecid, struct inode *inode, u32 *secid)
 	FILTER_CATHEGORY_VOID(INODE_CATH)
 	FILTER_OWN_PID_VOID()
 
+	DUMP_INODE_STRUCT(inode)
 
 //	bpf_printk("lsm_hook: inode: inode_getsecid\n");
 }

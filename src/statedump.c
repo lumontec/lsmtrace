@@ -2,6 +2,7 @@
 #include "events.h"
 #include "logger.h"
 #include <stdio.h>
+#include "syscall_helpers.h"
 
 
 /* Dump file struct event */
@@ -17,17 +18,51 @@ int printFunCallEvt(const struct Event *evt) {
 	return 0;
 }
 
+int printSysCallEnterEvt(const struct Event *evt) {
+	const sys_enter_Event* tevt = (sys_enter_Event*) evt;
+	log_info("-> %s: ", evt->label);
+	char buf[MAX_LABEL_SIZE];
+	syscall_name(tevt->id, buf, sizeof(buf));
+	log_info(" %s\n", buf);
+	return 0;
+}
+
+int printSysCallExitEvt(const struct Event *evt) {
+	const sys_exit_Event* tevt = (sys_exit_Event*) evt;
+	log_info("-> %s:  ", evt->label);
+	char buf[MAX_LABEL_SIZE];
+	syscall_name(tevt->id, buf, sizeof(buf));
+	log_info(" %s\n", buf);
+	log_info("     ret: %ld\n", tevt->ret);
+	return 0;
+}
+
+int printSuintMemberEvt(const struct Event *evt) {
+	const suint_member_Event* tevt = (suint_member_Event*) evt;
+	log_info("     %s = ", tevt->msg);
+	log_info("%hu\n", tevt->member);
+	return 0;
+}
+
 int printUintMemberEvt(const struct Event *evt) {
 	const uint_member_Event* tevt = (uint_member_Event*) evt;
 	log_info("     %s = ", tevt->msg);
-	log_info("%#010x\n", tevt->member);
+	log_info("%hu\n", tevt->member);
 	return 0;
 }
+
+int printLuintMemberEvt(const struct Event *evt) {
+	const luint_member_Event* tevt = (luint_member_Event*) evt;
+	log_info("     %s = ", tevt->msg);
+	log_info("%ld\n", tevt->member);
+	return 0;
+}
+
 
 int printLlintMemberEvt(const struct Event *evt) {
 	const llint_member_Event* tevt = (llint_member_Event*) evt;
 	log_info("     %s = ", tevt->msg);
-	log_info("%#010x\n", tevt->member);
+	log_info("%lld\n", tevt->member);
 	return 0;
 }
 
@@ -51,8 +86,20 @@ int dumpEvent(void* data, size_t len) {
 		case FUNCTION_CALL: {
 			return printFunCallEvt(evt);
 		}
+		case SYS_CALL_ENTER: {
+			return printSysCallEnterEvt(evt);
+		}
+		case SYS_CALL_EXIT: {
+			return printSysCallExitEvt(evt);
+		}
+		case MEMBER_SUINT: {
+			return printSuintMemberEvt(evt);
+		}
 		case MEMBER_UINT: {
 			return printUintMemberEvt(evt);
+		}
+		case MEMBER_LUINT: {
+			return printLuintMemberEvt(evt);
 		}
 		case MEMBER_LLINT: {
 			return printLlintMemberEvt(evt);

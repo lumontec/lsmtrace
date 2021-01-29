@@ -11,6 +11,7 @@
 #include "lsmtrace.skel.h"
 #include "statedump.h"
 #include "logger.h"
+#include "syscall_helpers.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -199,6 +200,8 @@ int main(int argc, char **argv)
 	struct lsmtrace_bpf *skel;
 	int err;
 
+	init_syscall_names();
+
 	/* Parse command line arguments */
 	err = argp_parse(&argp, argc, argv, 0, NULL, NULL);
 	if (err)
@@ -237,7 +240,7 @@ int main(int argc, char **argv)
 		goto cleanup;
 	}
 
-	log_info("\nAttaching hooks, don`t rush..\n");
+	log_info("Attaching hooks, don`t rush..\n");
 
 	/* Attach tracepoints */
 	err = lsmtrace_bpf__attach(skel);
@@ -287,6 +290,7 @@ cleanup:
 	/* Clean up */
 	ring_buffer__free(ringbuffer);
 	lsmtrace_bpf__destroy(skel);
+	free_syscall_names();
 
 	return err < 0 ? -err : 0;
 }

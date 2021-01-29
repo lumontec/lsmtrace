@@ -59,10 +59,22 @@ char struct_dump_label[MAX_MSG_SIZE] = "STRUCT_DUMP";
 	dump_func(func_call_name, func_call_args);						\
 }	
 
+#define DUMP_MEMBER_SUINT(...) {								\
+	const char dump_member_name[] = #__VA_ARGS__;						\
+	short unsigned int mptr = BPF_CORE_READ(__VA_ARGS__);					\
+	dump_suint_member(dump_member_name, mptr);						\
+}
+
 #define DUMP_MEMBER_UINT(...) {									\
 	const char dump_member_name[] = #__VA_ARGS__;						\
 	unsigned int mptr = BPF_CORE_READ(__VA_ARGS__);						\
 	dump_uint_member(dump_member_name, mptr);						\
+}
+
+#define DUMP_MEMBER_LUINT(...) {								\
+	const char dump_member_name[] = #__VA_ARGS__;						\
+	long unsigned int mptr = BPF_CORE_READ(__VA_ARGS__);					\
+	dump_luint_member(dump_member_name, mptr);						\
 }
 
 #define DUMP_MEMBER_LINT(...) {									\
@@ -112,6 +124,26 @@ static int dump_func(const char *fname, const char *fargs) {
 	return 0;
 }
 
+static int dump_suint_member(const char *mname, short unsigned int mptr) {
+
+	struct suint_member_Event *evt; 								
+	char suint_member_label[] = "MEMBER_DUMP";
+
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
+
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = MEMBER_SUINT;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), suint_member_label);	
+	evt->member = mptr;	
+	bpf_probe_read_str(evt->msg, sizeof(evt->msg), mname);				
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
+}
+
 static int dump_uint_member(const char *mname, unsigned int mptr) {
 
 	struct uint_member_Event *evt; 								
@@ -125,6 +157,26 @@ static int dump_uint_member(const char *mname, unsigned int mptr) {
 	evt->super.etype = MEMBER_UINT;
 
 	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), uint_member_label);	
+	evt->member = mptr;	
+	bpf_probe_read_str(evt->msg, sizeof(evt->msg), mname);				
+	bpf_ringbuf_submit(evt, ringbuffer_flags);						
+
+	return 0;
+}
+
+static int dump_luint_member(const char *mname, long unsigned int mptr) {
+
+	struct luint_member_Event *evt; 								
+	char luint_member_label[] = "MEMBER_DUMP";
+
+	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);
+
+	if (!evt)										
+		return -1;									
+
+	evt->super.etype = MEMBER_LUINT;
+
+	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), luint_member_label);	
 	evt->member = mptr;	
 	bpf_probe_read_str(evt->msg, sizeof(evt->msg), mname);				
 	bpf_ringbuf_submit(evt, ringbuffer_flags);						

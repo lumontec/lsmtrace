@@ -11,16 +11,21 @@
 
 enum Event_type {
 
-	FUNCTION_CALL = 0,
+	FUNCTION_CALL 	= 0,
 
-	MEMBER_UINT = 10,
-	MEMBER_LINT = 12,
-	MEMBER_LLINT = 13,
-	MEMBER_STR = 15,
+	SYS_CALL_ENTER	= 5,
+	SYS_CALL_EXIT	= 6,
 
-	STRUCT_FILE = 100,
-	STRUCT_DENTRY = 101,
-	STRUCT_QSTR = 102,
+	MEMBER_SUINT 	= 9,
+	MEMBER_UINT 	= 10,
+	MEMBER_LUINT 	= 11,
+	MEMBER_LINT 	= 12,
+	MEMBER_LLINT 	= 13,
+	MEMBER_STR 	= 15,
+
+	STRUCT_FILE 	= 100,
+	STRUCT_DENTRY 	= 101,
+	STRUCT_QSTR 	= 102,
 };
 
 /* Generic event interface */
@@ -29,6 +34,20 @@ typedef struct Event {
 	enum Event_type etype;
 	char label[MAX_LABEL_SIZE];
 } Event;
+
+
+/* Syscall Events */
+
+typedef struct sys_enter_Event {
+	Event super;
+	long int id;
+} sys_enter_Event;
+
+typedef  struct sys_exit_Event {
+	Event super;
+	long int id;
+	long int ret;
+} sys_exit_Event;
 
 
 /* Function call events */
@@ -42,11 +61,24 @@ typedef struct func_call_Event {
 
 /* Struct member dump events */
 
+
+typedef struct suint_member_Event {
+	Event super;
+	short unsigned int member;	
+	char msg[MAX_MSG_SIZE];
+} suint_member_Event;
+
 typedef struct uint_member_Event {
 	Event super;
 	unsigned int member;	
 	char msg[MAX_MSG_SIZE];
 } uint_member_Event;
+
+typedef struct luint_member_Event {
+	Event super;
+	long unsigned int member;	
+	char msg[MAX_MSG_SIZE];
+} luint_member_Event;
 
 typedef struct lint_member_Event {
 	Event super;

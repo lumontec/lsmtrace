@@ -77,6 +77,11 @@ $(OUTPUT)/logger.o: logger.c logger.h | $(OUTPUT)
 	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
 
 # Build statedump obj
+$(OUTPUT)/syscall_helpers.o: syscall_helpers.c syscall_helpers.h | $(OUTPUT)
+	$(call msg,CC,$@)
+	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
+
+# Build statedump obj
 $(OUTPUT)/statedump.o: statedump.c statedump.h | $(OUTPUT)
 	$(call msg,CC,$@)
 	$(Q)$(CLANG) $(CFLAGS) -Wno-unknown-attributes -fPIE -c $(filter %.c,$^) -o $@
@@ -88,7 +93,7 @@ $(OUTPUT)/lsmtrace.o: lsmtrace.c | $(OUTPUT)
 	$(Q)$(CC) $(CFLAGS) $(INCLUDES) -c $(filter %.c,$^) -o $@
 
 # Build application binary
-$(APPS): %: $(OUTPUT)/logger.o $(OUTPUT)/statedump.o $(OUTPUT)/lsmtrace.o $(LIBBPF_OBJ) | $(OUTPUT)
+$(APPS): %: $(OUTPUT)/logger.o $(OUTPUT)/syscall_helpers.o $(OUTPUT)/statedump.o $(OUTPUT)/lsmtrace.o $(LIBBPF_OBJ) | $(OUTPUT)
 	$(call msg,BINARY,$@)
 	$(Q)$(CC) $(CFLAGS) $^ -lelf -lz -o $@
 
