@@ -1630,6 +1630,616 @@ int BPF_PROG(socket_getpeername, struct socket *sock)
 	return 0;
 }
 
+SEC("lsm/socket_getsockopt")
+int BPF_PROG(socket_getsockopt, struct socket *sock, int level, int optname)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_getsockopt, struct socket *sock, int level, int optname)
+
+	bpf_printk("lsm_hook: socket: socket_getsockopt\n");
+	return 0;
+}
+
+SEC("lsm/socket_setsockopt")
+int BPF_PROG(socket_setsockopt, struct socket *sock, int level, int optname)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_setsockopt, struct socket *sock, int level, int optname)
+
+	bpf_printk("lsm_hook: socket: socket_setsockopt\n");
+	return 0;
+}
+
+SEC("lsm/socket_shutdown")
+int BPF_PROG(socket_shutdown, struct socket *sock, int how)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_shutdown, struct socket *sock, int how)
+
+	bpf_printk("lsm_hook: socket: socket_shutdown\n");
+	return 0;
+}
+
+SEC("lsm/socket_sock_rcv_skb")
+int BPF_PROG(socket_sock_rcv_skb, struct sock *sk, struct sk_buff *skb)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_sock_rcv_skb, struct sock *sk, struct sk_buff *skb)
+
+	bpf_printk("lsm_hook: socket: socket_sock_rcv_skb\n");
+	return 0;
+}
+
+//SEC("lsm/socket_getpeersec_stream")
+//int BPF_PROG(socket_getpeersec_stream, struct socket *sock,
+//	 char __user *optval, int __user *optlen, unsigned len)
+//{
+//	FILTER_OWN_PID_INT()
+//	DUMP_FUNC(socket_getpeersec_stream, struct socket *sock,
+//	 char __user *optval, int __user *optlen, unsigned len)
+//
+//	bpf_printk("lsm_hook: socket: socket_getpeersec_stream\n");
+//	return 0;
+//}
+
+SEC("lsm/socket_getpeersec_dgram")
+int BPF_PROG(socket_getpeersec_dgram, struct socket *sock,
+	 struct sk_buff *skb, u32 *secid)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(socket_getpeersec_dgram, struct socket *sock,
+	 struct sk_buff *skb, u32 *secid)
+
+	bpf_printk("lsm_hook: socket: socket_getpeersec_dgram\n");
+	return 0;
+}
+
+SEC("lsm/sk_alloc_security")
+int BPF_PROG(sk_alloc_security, struct sock *sk, int family, gfp_t priority)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(sk_alloc_security, struct sock *sk, int family, gfp_t priority)
+
+	bpf_printk("lsm_hook: socket: sk_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/sk_free_security")
+void BPF_PROG(sk_free_security, struct sock *sk)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(sk_free_security, struct sock *sk)
+
+	bpf_printk("lsm_hook: socket: sk_free_security\n");
+	return;
+}
+
+SEC("lsm/sk_clone_security")
+void BPF_PROG(sk_clone_security, const struct sock *sk,
+	 struct sock *newsk)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(sk_clone_security, const struct sock *sk,
+	 struct sock *newsk)
+
+	bpf_printk("lsm_hook: socket: sk_clone_security\n");
+	return;
+}
+
+SEC("lsm/sk_getsecid")
+void BPF_PROG(sk_getsecid, struct sock *sk, u32 *secid)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(sk_getsecid, struct sock *sk, u32 *secid)
+
+	bpf_printk("lsm_hook: socket: sk_getsecid\n");
+	return;
+}
+
+SEC("lsm/sock_graft")
+void BPF_PROG(sock_graft, struct sock *sk, struct socket *parent)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(sock_graft, struct sock *sk, struct socket *parent)
+
+	bpf_printk("lsm_hook: socket: sock_graft\n");
+	return;
+}
+
+SEC("lsm/inet_conn_request")
+int BPF_PROG(inet_conn_request, struct sock *sk, struct sk_buff *skb,
+	 struct request_sock *req)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(inet_conn_request, struct sock *sk, struct sk_buff *skb,
+	 struct request_sock *req)
+
+	bpf_printk("lsm_hook: socket: inet_conn_request\n");
+	return 0;
+}
+
+SEC("lsm/inet_csk_clone")
+void BPF_PROG(inet_csk_clone, struct sock *newsk,
+	 const struct request_sock *req)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(inet_csk_clone, struct sock *newsk,
+	 const struct request_sock *req)
+
+	bpf_printk("lsm_hook: socket: inet_csk_clone\n");
+	return;
+}
+
+SEC("lsm/inet_conn_established")
+void BPF_PROG(inet_conn_established, struct sock *sk,
+	 struct sk_buff *skb)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(inet_conn_established, struct sock *sk,
+	 struct sk_buff *skb)
+
+	bpf_printk("lsm_hook: socket: inet_conn_established\n");
+	return;
+}
+
+SEC("lsm/secmark_relabel_packet")
+int BPF_PROG(secmark_relabel_packet, u32 secid)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(secmark_relabel_packet, u32 secid)
+
+	bpf_printk("lsm_hook: socket: secmark_relabel_packet\n");
+	return 0;
+}
+
+SEC("lsm/secmark_refcount_inc")
+void BPF_PROG(secmark_refcount_inc)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(secmark_refcount_inc)
+
+	bpf_printk("lsm_hook: socket: secmark_relabel_packet\n");
+	return;
+}
+
+SEC("lsm/secmark_refcount_dec")
+void BPF_PROG(secmark_refcount_dec)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(secmark_refcount_dec)
+
+	bpf_printk("lsm_hook: socket: secmark_refcount_dec\n");
+	return;
+}
+
+SEC("lsm/req_classify_flow")
+void BPF_PROG(req_classify_flow, const struct request_sock *req,
+	 struct flowi *fl)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(req_classify_flow)
+
+	bpf_printk("lsm_hook: socket: req_classify_flow\n");
+	return;
+}
+
+SEC("lsm/tun_dev_alloc_security")
+int BPF_PROG(tun_dev_alloc_security, void **security)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(tun_dev_alloc_security, void **security)
+
+	bpf_printk("lsm_hook: socket: tun_dev_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/tun_dev_free_security")
+void BPF_PROG(tun_dev_free_security, void *security)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(tun_dev_free_security, void *security)
+
+	bpf_printk("lsm_hook: socket: tun_dev_free_security\n");
+	return;
+}
+
+SEC("lsm/tun_dev_create")
+int BPF_PROG(tun_dev_create)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(tun_dev_create)
+
+	bpf_printk("lsm_hook: socket: tun_dev_create\n");
+	return 0;
+}
+
+SEC("lsm/tun_dev_attach_queue")
+int BPF_PROG(tun_dev_attach_queue, void *security)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(tun_dev_attach_queue, void *security)
+
+	bpf_printk("lsm_hook: socket: tun_dev_attach_queue\n");
+	return 0;
+}
+
+SEC("lsm/tun_dev_attach")
+int BPF_PROG(tun_dev_attach, struct sock *sk, void *security)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(tun_dev_attach, struct sock *sk, void *security)
+
+	bpf_printk("lsm_hook: socket: tun_dev_attach\n");
+	return 0;
+}
+
+SEC("lsm/tun_dev_open")
+int BPF_PROG(tun_dev_open, void *security)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(tun_dev_open, void *security)
+
+	bpf_printk("lsm_hook: socket: tun_dev_open\n");
+	return 0;
+}
+
+
+/* Security hooks for SCTP */
+
+SEC("lsm/tun_dev_open")
+int BPF_PROG(sctp_assoc_request, struct sctp_endpoint *ep,
+	 struct sk_buff *skb)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(sctp_assoc_request, struct sctp_endpoint *ep,
+	 struct sk_buff *skb)
+
+	bpf_printk("lsm_hook: sctp: sctp_assoc_request\n");
+	return 0;
+}
+
+SEC("lsm/sctp_bind_connect")
+int BPF_PROG(sctp_bind_connect, struct sock *sk, int optname,
+	 struct sockaddr *address, int addrlen)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(sctp_bind_connect, struct sock *sk, int optname,
+	 struct sockaddr *address, int addrlen)
+
+	bpf_printk("lsm_hook: sctp: sctp_bind_connect\n");
+	return 0;
+}
+
+SEC("lsm/sctp_sk_clone")
+void BPF_PROG(sctp_sk_clone, struct sctp_endpoint *ep,
+	 struct sock *sk, struct sock *newsk)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(sctp_sk_clone, struct sctp_endpoint *ep,
+	 struct sock *sk, struct sock *newsk)
+
+	bpf_printk("lsm_hook: sctp: sctp_sk_clone\n");
+	return;
+}
+
+
+
+/* Security hooks for Infiniband */
+
+
+SEC("lsm/sctp_sk_clone")
+int BPF_PROG(ib_pkey_access, void *sec, u64 subnet_prefix, u16 pkey)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(ib_pkey_access, void *sec, u64 subnet_prefix, u16 pkey)
+
+	bpf_printk("lsm_hook: infiniband: ib_pkey_access\n");
+	return 0;
+}
+
+SEC("lsm/ib_endport_manage_subnet")
+int BPF_PROG(ib_endport_manage_subnet, void *sec, const char *dev_name,
+	 u8 port_num)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(ib_endport_manage_subnet, void *sec, const char *dev_name,
+	 u8 port_num)
+
+	bpf_printk("lsm_hook: infiniband: ib_endport_manage_subnet\n");
+	return 0;
+}
+
+SEC("lsm/ib_alloc_security")
+int BPF_PROG(ib_alloc_security, void **sec)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(ib_alloc_security, void **sec)
+
+	bpf_printk("lsm_hook: infiniband: ib_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/ib_free_security")
+void BPF_PROG(ib_free_security, void *sec)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(ib_free_security, void *sec)
+
+	bpf_printk("lsm_hook: infiniband: ib_free_security\n");
+	return;
+}
+
+
+
+/* Security hooks for XFRM operations. */
+
+SEC("lsm/xfrm_policy_alloc_security")
+int BPF_PROG(xfrm_policy_alloc_security, struct xfrm_sec_ctx **ctxp,
+	 struct xfrm_user_sec_ctx *sec_ctx, gfp_t gfp)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_policy_alloc_security, struct xfrm_sec_ctx **ctxp,
+	 struct xfrm_user_sec_ctx *sec_ctx, gfp_t gfp)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_policy_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_policy_clone_security")
+int BPF_PROG(xfrm_policy_clone_security, struct xfrm_sec_ctx *old_ctx,
+	 struct xfrm_sec_ctx **new_ctx)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_policy_clone_security, struct xfrm_sec_ctx *old_ctx,
+	 struct xfrm_sec_ctx **new_ctx)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_policy_clone_security\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_policy_free_security")
+void BPF_PROG(xfrm_policy_free_security, struct xfrm_sec_ctx *xfrm_ctx)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(xfrm_policy_free_security, struct xfrm_sec_ctx *xfrm_ctx)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_policy_clone_security\n");
+	return;
+}
+
+SEC("lsm/xfrm_policy_delete_security")
+int BPF_PROG(xfrm_policy_delete_security, struct xfrm_sec_ctx *xfrm_ctx)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_policy_delete_security, struct xfrm_sec_ctx *xfrm_ctx)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_policy_delete_security\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_state_alloc")
+int BPF_PROG(xfrm_state_alloc, struct xfrm_state *x, struct xfrm_user_sec_ctx *sec_ctx)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_state_alloc, struct xfrm_state *x, struct xfrm_user_sec_ctx *sec_ctx)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_state_alloc\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_state_alloc_acquire")
+int BPF_PROG(xfrm_state_alloc_acquire, struct xfrm_state *x,
+	 struct xfrm_sec_ctx *polsec, u32 secid)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_state_alloc_acquire, struct xfrm_state *x,
+	 struct xfrm_sec_ctx *polsec, u32 secid)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_state_alloc_acquire\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_state_free_security")
+void BPF_PROG(xfrm_state_free_security, struct xfrm_state *x)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(xfrm_state_free_security, struct xfrm_state *x)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_state_alloc_acquire\n");
+	return;
+}
+
+SEC("lsm/xfrm_state_delete_security")
+int BPF_PROG(xfrm_state_delete_security, struct xfrm_state *x)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_state_delete_security, struct xfrm_state *x)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_state_delete_security\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_policy_lookup")
+int BPF_PROG(xfrm_policy_lookup, struct xfrm_sec_ctx *xfrm_ctx, u32 fl_secid,
+	 u8 dir)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_policy_lookup, struct xfrm_sec_ctx *xfrm_ctx, u32 fl_secid,
+	 u8 dir)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_policy_lookup\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_state_pol_flow_match")
+int BPF_PROG(xfrm_state_pol_flow_match, struct xfrm_state *x,
+	 struct xfrm_policy *xp, const struct flowi *fl)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_state_pol_flow_match, struct xfrm_state *x,
+	 struct xfrm_policy *xp, const struct flowi *fl)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_state_pol_flow_match\n");
+	return 0;
+}
+
+SEC("lsm/xfrm_state_pol_flow_match")
+int BPF_PROG(xfrm_decode_session, struct sk_buff *skb, u32 *secid,
+	 int ckall)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(xfrm_decode_session, struct sk_buff *skb, u32 *secid,
+	 int ckall)
+
+	bpf_printk("lsm_hook: xfrm: xfrm_decode_session\n");
+	return 0;
+}
+
+
+/* Security hooks affecting all Key Management operations */
+
+
+SEC("lsm/key_alloc")
+int BPF_PROG(key_alloc, struct key *key, const struct cred *cred,
+	 unsigned long flags)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(key_alloc, struct key *key, const struct cred *cred,
+	 unsigned long flags)
+
+	bpf_printk("lsm_hook: key_management: key_alloc\n");
+	return 0;
+}
+
+SEC("lsm/key_free")
+void BPF_PROG(key_free, struct key *key)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(key_free, struct key *key)
+
+	bpf_printk("lsm_hook: key_management: key_free\n");
+	return;
+}
+
+SEC("lsm/key_permission")
+int BPF_PROG(key_permission, key_ref_t key_ref, const struct cred *cred,
+	 enum key_need_perm need_perm)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(key_permission, key_ref_t key_ref, const struct cred *cred,
+	 enum key_need_perm need_perm)
+
+	bpf_printk("lsm_hook: key_management: key_permission\n");
+	return 0;
+}
+
+SEC("lsm/key_getsecurity")
+int BPF_PROG(key_getsecurity, struct key *key, char **_buffer)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(key_getsecurity, struct key *key, char **_buffer)
+
+	bpf_printk("lsm_hook: key_management: key_getsecurity\n");
+	return 0;
+}
+
+
+
+/* Security hooks affecting all System V IPC operations. */
+
+SEC("lsm/msg_msg_alloc_security")
+int BPF_PROG(msg_msg_alloc_security, struct msg_msg *msg)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(msg_msg_alloc_security, struct msg_msg *msg)
+
+	bpf_printk("lsm_hook: systemv_ipc: msg_msg_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/msg_msg_free_security")
+void BPF_PROG(msg_msg_free_security, struct msg_msg *msg)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(msg_msg_free_security, struct msg_msg *msg)
+
+	bpf_printk("lsm_hook: systemv_ipc: msg_msg_free_security\n");
+	return;
+}
+
+
+/* Security hooks for System V IPC Message Queues */
+
+
+SEC("lsm/msg_queue_alloc_security")
+int BPF_PROG(msg_queue_alloc_security, struct kern_ipc_perm *perm)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(msg_queue_alloc_security, struct msg_msg *msg)
+
+	bpf_printk("lsm_hook: systemv_ipc_msgqueue: msg_queue_alloc_security\n");
+	return 0;
+}
+
+SEC("lsm/msg_queue_free_security")
+void BPF_PROG(msg_queue_free_security, struct kern_ipc_perm *perm)
+{
+	FILTER_OWN_PID_VOID()
+	DUMP_FUNC(msg_queue_free_security, struct kern_ipc_perm *perm)
+
+	bpf_printk("lsm_hook: systemv_ipc_msgqueue: msg_queue_free_security\n");
+	return;
+}
+
+SEC("lsm/msg_queue_associate")
+int BPF_PROG(msg_queue_associate, struct kern_ipc_perm *perm, int msqflg)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(msg_queue_associate, struct kern_ipc_perm *perm, int msqflg)
+
+	bpf_printk("lsm_hook: systemv_ipc_msgqueue: msg_queue_associate\n");
+	return 0;
+}
+
+SEC("lsm/msg_queue_msgctl")
+int BPF_PROG(msg_queue_msgctl, struct kern_ipc_perm *perm, int cmd)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(msg_queue_msgctl, struct kern_ipc_perm *perm, int cmd)
+
+	bpf_printk("lsm_hook: systemv_ipc_msgqueue: msg_queue_msgctl\n");
+	return 0;
+}
+
+SEC("lsm/msg_queue_msgsnd")
+int BPF_PROG(msg_queue_msgsnd, struct kern_ipc_perm *perm,
+	 struct msg_msg *msg, int msqflg)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(msg_queue_msgsnd, struct kern_ipc_perm *perm,
+	 struct msg_msg *msg, int msqflg)
+
+	bpf_printk("lsm_hook: systemv_ipc_msgqueue: msg_queue_msgsnd\n");
+	return 0;
+}
+
+SEC("lsm/msg_queue_msgrcv")
+int BPF_PROG(msg_queue_msgrcv, struct kern_ipc_perm *perm,
+	 struct msg_msg *msg, struct task_struct *target, long type, int mode)
+{
+	FILTER_OWN_PID_INT()
+	DUMP_FUNC(msg_queue_msgrcv, struct kern_ipc_perm *perm,
+	 struct msg_msg *msg, struct task_struct *target, long type, int mode)
+
+	bpf_printk("lsm_hook: systemv_ipc_msgqueue: msg_queue_msgrcv\n");
+	return 0;
+}
+
+
+
+
+
+
 
 
 
