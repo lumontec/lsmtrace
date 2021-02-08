@@ -5,10 +5,10 @@ Trace all lsm hooks touched by executable
 ## Requirements
 
 Your kernel must have been compiled with the follwing options:
-BPF_SYSCALL
-BPF_LSM
-DEBUG_INFO
-DEBUG_INFO_BTF
+* BPF_SYSCALL
+* BPF_LSM
+* DEBUG_INFO
+* DEBUG_INFO_BTF
 
 ## Compilation
 
@@ -21,7 +21,7 @@ $ make
 ## Run
 
 ```shell
-$ sudo ./lsmtrace /usr/bin/ls -a /home$ cd src
+$ sudo ./lsmtrace /usr/bin/ls -a /home  
 
 Attaching hooks, don`t rush..
 
