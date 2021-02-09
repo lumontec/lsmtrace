@@ -1,7 +1,6 @@
 # lsmtrace
 
 Trace all lsm hooks touched by executable.
-
 Have a look at my **[blog post](https://lumontec.com/1-building-a-security-tracing)** to find out more.
 
 ## Requirements
