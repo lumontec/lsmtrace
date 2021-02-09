@@ -44,7 +44,7 @@ static struct argp_args {
 
 
 static int argcnt = 1;
-const char    *my_exec_argv[63] = {}; // {"/bin/ls" ,"-lath", "/home", NULL};
+const char    *my_exec_argv[63] = {};
 const char    *my_exec_path = ""; 
 const char    *output_path = ""; 
 

@@ -269,24 +269,4 @@ static int dump_ustr_member(const char *mname, const unsigned char *mptr) {
 	return 0;
 }
 
-
-
-//#define DUMP_STRUCT(STYPE, ETYPE, SPTR) 							\
-//{												\
-///*	struct STYPE *STYPE;									\
-//*/												\
-//	struct STYPE##_struct_Event *evt; 							\
-//												\
-//	evt = bpf_ringbuf_reserve(&ringbuf, sizeof(*evt), ringbuffer_flags);			\
-//												\
-//	if (!evt)										\
-//		return -1;									\
-//												\
-//	evt->super.etype = ETYPE;								\
-//	bpf_probe_read_str(evt->super.label, sizeof(evt->super.label), struct_dump_label);	\
-//	bpf_probe_read_kernel(&evt->STYPE, sizeof(evt->STYPE), SPTR);				\
-//												\
-//	bpf_ringbuf_submit(evt, ringbuffer_flags);						\
-//}
-
 #endif /* _BPF_HELPERS_H */
